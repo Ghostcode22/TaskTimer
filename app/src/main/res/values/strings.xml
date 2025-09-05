@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">TaskTimer</string>
+    <string name="title_timer">Timer</string>
+    <string name="start">Start</string>
+    <string name="pause">Pause</string>
+    <string name="reset">Reset</string>
+    <string name="twenty_five_minutes">25:00</string>
 </resources>

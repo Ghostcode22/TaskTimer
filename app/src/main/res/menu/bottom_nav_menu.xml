@@ -4,4 +4,8 @@
         android:id="@+id/timerFragment"
         android:icon="@android:drawable/ic_media_play"
         android:title="@string/title_timer"/>
+    <item
+        android:id="@+id/tasksFragment"
+        android:icon="@android:drawable/ic_input_add"
+        android:title="@string/title_task"/>
 </menu>

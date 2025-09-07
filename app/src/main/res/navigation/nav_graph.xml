@@ -9,4 +9,8 @@
         android:name="com.erickoeckel.tasktimer.TimerFragment"
         android:label="@string/title_timer"
         app:defaultNavHost="false" />
+    <fragment
+        android:id="@+id/tasksFragment"
+        android:name="com.erickoeckel.tasktimer.TasksFragment"
+        android:label="@string/title_task" />
 </navigation>

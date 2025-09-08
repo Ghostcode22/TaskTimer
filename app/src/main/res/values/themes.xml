@@ -1,9 +1,31 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
-    <style name="Base.Theme.TaskTimer" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your light theme here. -->
-        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+
+    <style name="Theme.TaskTimer" parent="Theme.Material3.DayNight.NoActionBar">
+
+        <item name="android:windowBackground">@color/navy</item>
+
+        <item name="colorPrimary">@color/charcoal</item>
+        <item name="colorOnPrimary">@color/gold</item>
+        <item name="colorSecondary">@color/soft_gold</item>
+        <item name="colorOnSecondary">@color/navy</item>
+
+        <item name="colorSurface">@color/navy</item>
+        <item name="colorOnSurface">@color/white</item>
+        <item name="android:textColor">@color/white</item>
+
+        <item name="bottomNavigationStyle">@style/Widget.TaskTimer.BottomNavigation</item>
+
+        <item name="textAppearanceHeadlineLarge">@style/TextAppearance.TaskTimer.Timer</item>
+        <item name="textAppearanceBodyLarge">@style/TextAppearance.TaskTimer.Body</item>
+        <item name="textAppearanceBodyMedium">@style/TextAppearance.TaskTimer.Body</item>
+        <item name="textAppearanceLabelLarge">@style/TextAppearance.TaskTimer.Label</item>
     </style>
 
-    <style name="Theme.TaskTimer" parent="Base.Theme.TaskTimer" />
+    <style name="Theme.TaskTimer.Splash" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/navy</item>
+        <item name="windowSplashScreenAnimatedIcon">@mipmap/ic_launcher</item>
+        <item name="postSplashScreenTheme">@style/Theme.TaskTimer</item>
+    </style>
+
+
 </resources>

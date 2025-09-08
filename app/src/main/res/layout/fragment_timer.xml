@@ -5,18 +5,15 @@
 
     <TextView
         android:id="@+id/tvPhase"
+        style="?attr/textAppearanceLabelLarge"
         android:text="FOCUS"
-        android:textSize="18sp"
-        android:textColor="@color/gold"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 
     <TextView
         android:id="@+id/tvTime"
+        style="?attr/textAppearanceHeadlineLarge"
         android:text="25:00"
-        android:textSize="48sp"
-        android:textStyle="bold"
-        android:textColor="@color/navy"
         android:layout_marginTop="6dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"/>

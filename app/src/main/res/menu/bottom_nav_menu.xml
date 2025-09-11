@@ -8,4 +8,8 @@
         android:id="@+id/tasksFragment"
         android:icon="@android:drawable/ic_input_add"
         android:title="@string/title_task"/>
+    <item
+        android:id="@+id/profileFragment"
+        android:icon="@android:drawable/ic_menu_myplaces"
+        android:title="@string/title_profile" />
 </menu>

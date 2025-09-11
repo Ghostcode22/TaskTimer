@@ -1,17 +1,18 @@
 package com.erickoeckel.tasktimer;
 
+import android.content.Intent;
 import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.NavigationUI;
 import com.erickoeckel.tasktimer.databinding.ActivityMainBinding;
+import com.google.firebase.auth.FirebaseAuth;
 
 public class MainActivity extends AppCompatActivity {
     private ActivityMainBinding binding;
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    @Override protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
@@ -20,10 +21,18 @@ public class MainActivity extends AppCompatActivity {
                 (NavHostFragment) getSupportFragmentManager()
                         .findFragmentById(R.id.nav_host_fragment);
         if (navHostFragment == null) {
-            throw new IllegalStateException("NavHostFragment not found (R.id.nav_host_fragment)");
+            throw new IllegalStateException("NavHostFragment not found. Check activity_main.xml id.");
         }
-        NavController navController = navHostFragment.getNavController();
 
+        NavController navController = navHostFragment.getNavController();
         NavigationUI.setupWithNavController(binding.bottomNav, navController);
+    }
+
+    @Override protected void onStart() {
+        super.onStart();
+        if (FirebaseAuth.getInstance().getCurrentUser() == null) {
+            startActivity(new Intent(this, AuthActivity.class));
+            finish();
+        }
     }
 }

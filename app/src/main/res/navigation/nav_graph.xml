@@ -13,4 +13,9 @@
         android:id="@+id/tasksFragment"
         android:name="com.erickoeckel.tasktimer.TasksFragment"
         android:label="@string/title_task" />
+
+    <fragment
+        android:id="@+id/profileFragment"
+        android:name="com.erickoeckel.tasktimer.ProfileFragment"
+        android:label="@string/title_profile" />
 </navigation>

@@ -2,8 +2,11 @@
     <string name="app_name">TaskTimer</string>
     <string name="title_timer">Timer</string>
     <string name="title_task">task</string>
+    <string name="title_profile">Profile</string>
     <string name="start">Start</string>
     <string name="pause">Pause</string>
     <string name="reset">Reset</string>
+    <string name="login">Login</string>
+    <string name="register">Register</string>
     <string name="twenty_five_minutes">25:00</string>
 </resources>

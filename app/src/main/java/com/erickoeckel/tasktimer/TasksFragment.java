@@ -1,6 +1,7 @@
 package com.erickoeckel.tasktimer;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,6 +10,7 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import com.google.firebase.firestore.FirebaseFirestore;
 import java.util.ArrayList;
 import java.util.UUID;
 
@@ -23,15 +25,24 @@ public class TasksFragment extends Fragment {
         vm = new ViewModelProvider(requireActivity()).get(TasksViewModel.class);
 
         RecyclerView rv = v.findViewById(R.id.rvTasks);
-        adapter = new TasksAdapter(new ArrayList<>(), vm::toggleDone);
+        adapter = new TasksAdapter(new ArrayList<>(), (String id, boolean done) -> {
+            vm.toggleDone(id, done)
+                    .addOnSuccessListener(unused -> {
+                        if (done) {
+                            Rewards.awardTaskCompleted(FirebaseFirestore.getInstance())
+                                    .addOnFailureListener(e -> Log.e("Rewards", "awardTaskCompleted failed", e));
+                        }
+                    })
+                    .addOnFailureListener(e -> Log.e("Tasks", "toggleDone failed", e));
+        });
         rv.setLayoutManager(new LinearLayoutManager(getContext()));
         rv.setAdapter(adapter);
 
         EditText et = v.findViewById(R.id.etTask);
-        v.findViewById(R.id.btnAdd).setOnClickListener(x -> {
-            String t = et.getText().toString().trim();
-            if (!t.isEmpty()) {
-                vm.addTask(new Task(UUID.randomUUID().toString(), t, false));
+        v.findViewById(R.id.btnAdd).setOnClickListener(view -> {
+            String title = et.getText().toString().trim();
+            if (!title.isEmpty()) {
+                vm.addTask(new Task(UUID.randomUUID().toString(), title, false));
                 et.setText("");
             }
         });

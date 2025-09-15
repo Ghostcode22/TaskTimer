@@ -70,16 +70,16 @@ public class AuthActivity extends AppCompatActivity {
                         if (task.isSuccessful()) {
                             FirebaseUser user = auth.getCurrentUser();
                             if (user != null) {
-                                // Create a Firestore user doc on first signup
-                                Map<String, Object> doc = new HashMap<>();
-                                doc.put("email", user.getEmail());
-                                doc.put("createdAt", FieldValue.serverTimestamp());
-                                doc.put("xp", 0);
-                                doc.put("coins", 0);
-                                doc.put("streak", 0);
+                                Map<String,Object> base = new HashMap<>();
+                                base.put("email", user.getEmail());
+                                base.put("xp", 0L);
+                                base.put("coins", 0L);
+                                base.put("createdAt", FieldValue.serverTimestamp());
+                                db.collection("users").document(user.getUid()).set(base, SetOptions.merge());
+
 
                                 db.collection("users").document(user.getUid())
-                                        .set(doc, SetOptions.merge())
+                                        .set(base, SetOptions.merge())
                                         .addOnSuccessListener(unused -> goToApp())
                                         .addOnFailureListener(e -> {
                                             showError("Account created, but profile save failed: " + e.getMessage());

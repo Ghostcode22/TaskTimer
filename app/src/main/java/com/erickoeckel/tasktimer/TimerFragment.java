@@ -10,6 +10,9 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+
+import com.google.firebase.firestore.FirebaseFirestore;
+
 import java.util.Locale;
 
 public class TimerFragment extends Fragment {
@@ -29,6 +32,7 @@ public class TimerFragment extends Fragment {
         btnReset = v.findViewById(R.id.btnReset);
 
         vm = new ViewModelProvider(requireActivity()).get(TimerViewModel.class);
+        final FirebaseFirestore db = FirebaseFirestore.getInstance();
 
         vm.getRemaining().observe(getViewLifecycleOwner(), ms -> tvTime.setText(format(ms)));
         vm.getPhase().observe(getViewLifecycleOwner(), p -> tvPhase.setText(p == TimerViewModel.Phase.FOCUS ? "FOCUS" : "BREAK"));
@@ -41,6 +45,16 @@ public class TimerFragment extends Fragment {
         btnPause.setOnClickListener(x -> vm.pause());
         btnReset.setOnClickListener(x -> vm.resetToFocus());
 
+        final TimerViewModel.Phase[] lastPhase = new TimerViewModel.Phase[]{null};
+
+        vm.getPhase().observe(getViewLifecycleOwner(), p -> {
+            if (lastPhase[0] == TimerViewModel.Phase.FOCUS && p == TimerViewModel.Phase.BREAK) {
+                Rewards.awardFocusSession(db)
+                        .addOnFailureListener(e ->
+                                System.out.println("awardFocusSession failed: " + e.getMessage()));
+            }
+            lastPhase[0] = p;
+        });
         return v;
     }
 

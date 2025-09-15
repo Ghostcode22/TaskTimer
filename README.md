@@ -76,4 +76,6 @@ Core Pomodoro timer working.
 
 Task creation working.
 
-XP/coin system in progress.
+XP/coin system working.
+
+Habit tracker in progress.

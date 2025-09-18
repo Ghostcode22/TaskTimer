@@ -15,6 +15,8 @@ public final class Rewards {
     public static final long COINS_PER_TASK_DONE = 5;
     public static final long XP_PER_FOCUS        = 25;
     public static final long COINS_PER_FOCUS     = 10;
+    public static final long XP_PER_HABIT_CHECK    = 10;
+    public static final long COINS_PER_HABIT_CHECK = 3;
 
     private Rewards() {}
 
@@ -50,6 +52,10 @@ public final class Rewards {
 
     public static Task<Void> awardTaskCompleted(FirebaseFirestore db) {
         return apply(db, XP_PER_TASK_DONE, COINS_PER_TASK_DONE);
+    }
+
+    public static com.google.android.gms.tasks.Task<Void> awardHabitCheck(FirebaseFirestore db) {
+        return apply(db, XP_PER_HABIT_CHECK, COINS_PER_HABIT_CHECK);
     }
 }
 

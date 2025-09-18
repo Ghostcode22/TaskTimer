@@ -9,6 +9,10 @@
         android:icon="@android:drawable/ic_input_add"
         android:title="@string/title_task"/>
     <item
+        android:id="@+id/habitsFragment"
+        android:icon="@drawable/ic_habit"
+        android:title="@string/habits" />
+    <item
         android:id="@+id/profileFragment"
         android:icon="@android:drawable/ic_menu_myplaces"
         android:title="@string/title_profile" />

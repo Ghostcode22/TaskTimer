@@ -9,4 +9,16 @@
     <string name="login">Login</string>
     <string name="register">Register</string>
     <string name="twenty_five_minutes">25:00</string>
+    <string name="add_habit">Add Habit</string>
+    <string name="habit_title_e_g_drink_water">Habit title (e.g., Drink water)</string>
+    <string name="repeat_on">Repeat on:</string>
+    <string name="sun">Sun</string>
+    <string name="mon">Mon</string>
+    <string name="tue">Tue</string>
+    <string name="wed">Wed</string>
+    <string name="thu">Thu</string>
+    <string name="fri">Fri</string>
+    <string name="sat">Sat</string>
+    <string name="habits">Habits</string>
+    <string name="no_habits_yet_ntap_to_create_your_first_one">No habits yet.\nTap + to create your first one.</string>
 </resources>

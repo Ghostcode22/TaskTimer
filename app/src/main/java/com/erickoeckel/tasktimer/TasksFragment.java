@@ -25,16 +25,12 @@ public class TasksFragment extends Fragment {
         vm = new ViewModelProvider(requireActivity()).get(TasksViewModel.class);
 
         RecyclerView rv = v.findViewById(R.id.rvTasks);
-        adapter = new TasksAdapter(new ArrayList<>(), (String id, boolean done) -> {
-            vm.toggleDone(id, done)
-                    .addOnSuccessListener(unused -> {
-                        if (done) {
-                            Rewards.awardTaskCompleted(FirebaseFirestore.getInstance())
-                                    .addOnFailureListener(e -> Log.e("Rewards", "awardTaskCompleted failed", e));
-                        }
-                    })
-                    .addOnFailureListener(e -> Log.e("Tasks", "toggleDone failed", e));
+        adapter = new TasksAdapter(new ArrayList<>(), (String id, boolean ignored) -> {
+            vm.completeTask(id) // always sets done=true
+                    .addOnSuccessListener(unused -> Rewards.awardTaskCompleted(FirebaseFirestore.getInstance()))
+                    .addOnFailureListener(e -> Log.e("Tasks","completeTask failed", e));
         });
+
         rv.setLayoutManager(new LinearLayoutManager(getContext()));
         rv.setAdapter(adapter);
 

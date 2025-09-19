@@ -11,7 +11,6 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.SetOptions;
-
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -96,7 +95,6 @@ public class HabitsViewModel extends ViewModel {
                 .set(new HashMap<String,Object>() {{ put("completed", true); }},
                         SetOptions.merge());
     }
-
 
     private static String previousActiveDate(java.util.List<Boolean> days, String yyyyMmDd) {
         if (days == null || days.size() < 7) return null;

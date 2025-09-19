@@ -64,5 +64,10 @@ public class TasksViewModel extends ViewModel {
     protected void onCleared() {
         if (reg != null) { reg.remove(); reg = null; }
     }
+
+    public com.google.android.gms.tasks.Task<Void> completeTask(String id) {
+        return userTasksRef().document(id).update("done", true);
+    }
+
 }
 

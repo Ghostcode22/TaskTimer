@@ -52,16 +52,21 @@ public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.VH> {
     public void onBindViewHolder(@NonNull VH h, int pos) {
         Task t = data.get(pos);
 
-        // Avoid triggering the listener while we set state
         h.cb.setOnCheckedChangeListener(null);
-
         h.title.setText(t.getTitle());
         h.cb.setChecked(t.isDone());
 
-        h.cb.setOnCheckedChangeListener((CompoundButton b, boolean isChecked) -> {
-            if (toggle != null) toggle.onToggle(t.getId(), isChecked);
+        boolean canToggle = !t.isDone();
+        h.cb.setEnabled(canToggle);
+        h.cb.setAlpha(canToggle ? 1f : 0.4f);
+
+        h.cb.setOnCheckedChangeListener((CompoundButton b, boolean checked) -> {
+            if (canToggle && checked && toggle != null) {
+                toggle.onToggle(t.getId(), true);
+            }
         });
     }
+
 
     @Override
     public int getItemCount() { return data.size(); }

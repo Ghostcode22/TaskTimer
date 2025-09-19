@@ -11,6 +11,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.SetOptions;
+
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -60,62 +61,42 @@ public class HabitsViewModel extends ViewModel {
     }
 
     public void toggleToday(String habitId, boolean checked) {
-        final String today = new java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.US)
-                .format(new java.util.Date());
-        final com.google.firebase.firestore.DocumentReference habitDoc = habitsRef().document(habitId);
+        final String today = new SimpleDateFormat("yyyy-MM-dd", Locale.US).format(new Date());
+        final DocumentReference habitDoc = habitsRef().document(habitId);
 
-        if (checked) {
-            db.runTransaction(trx -> {
-                com.google.firebase.firestore.DocumentSnapshot hSnap = trx.get(habitDoc);
-                if (!hSnap.exists()) return null;
+        if (!checked) return;
 
-                Integer streak = (hSnap.getLong("streak") == null) ? 0 : hSnap.getLong("streak").intValue();
-                String last = hSnap.getString("lastCompleted");
-                @SuppressWarnings("unchecked")
-                java.util.List<Boolean> days = (java.util.List<Boolean>) hSnap.get("days");
+        db.runTransaction(trx -> {
+            DocumentSnapshot hSnap = trx.get(habitDoc);
+            if (!hSnap.exists()) return null;
 
-                if (!Habit.isActiveToday(days)) return null;
+            String last = hSnap.getString("lastCompleted");
+            if (today.equals(last)) return null;
 
-                String prevScheduled = previousActiveDate(days, today);
+            Integer streak = (hSnap.getLong("streak") == null) ? 0 : hSnap.getLong("streak").intValue();
+            @SuppressWarnings("unchecked")
+            List<Boolean> days = (List<Boolean>) hSnap.get("days");
+            if (!Habit.isActiveToday(days)) return null;
 
-                int newStreak;
-                if (today.equals(last)) {
-                    newStreak = streak;
-                } else if (prevScheduled != null && prevScheduled.equals(last)) {
-                    newStreak = streak + 1;
-                } else {
-                    newStreak = 1;
-                }
+            String prevScheduled = previousActiveDate(days, today);
+            int newStreak = (prevScheduled != null && prevScheduled.equals(last)) ? streak + 1 : 1;
 
-                java.util.Map<String,Object> upd = new java.util.HashMap<>();
-                upd.put("streak", newStreak);
-                upd.put("lastCompleted", today);
-                trx.set(habitDoc, upd, com.google.firebase.firestore.SetOptions.merge());
-                return null;
-            }).addOnSuccessListener(unused ->
-                    Rewards.awardHabitCheck(db).addOnFailureListener(e ->
-                            android.util.Log.e("Rewards","habit award failed", e))
-            ).addOnFailureListener(e ->
-                    android.util.Log.e("HabitsVM","toggleToday failed", e)
-            );
+            Map<String,Object> upd = new HashMap<>();
+            upd.put("streak", newStreak);
+            upd.put("lastCompleted", today);
+            trx.set(habitDoc, upd, SetOptions.merge());
+            return null;
+        }).addOnSuccessListener(unused ->
+                Rewards.awardHabitCheck(db)
+        ).addOnFailureListener(e ->
+                android.util.Log.e("HabitsVM","toggleToday failed", e)
+        );
 
-        } else {
-            db.runTransaction(trx -> {
-                com.google.firebase.firestore.DocumentSnapshot hSnap = trx.get(habitDoc);
-                String last = hSnap.exists() ? hSnap.getString("lastCompleted") : null;
-                if (today.equals(last)) {
-                    java.util.Map<String,Object> upd = new java.util.HashMap<>();
-                    upd.put("lastCompleted", null);
-                    // optional: keep streak or reset; simplest: reset
-                    upd.put("streak", 0);
-                    trx.set(habitDoc, upd, com.google.firebase.firestore.SetOptions.merge());
-                }
-                return null;
-            }).addOnFailureListener(e ->
-                    android.util.Log.e("HabitsVM","uncheckToday failed", e)
-            );
-        }
+        habitDoc.collection("completions").document(today)
+                .set(new HashMap<String,Object>() {{ put("completed", true); }},
+                        SetOptions.merge());
     }
+
 
     private static String previousActiveDate(java.util.List<Boolean> days, String yyyyMmDd) {
         if (days == null || days.size() < 7) return null;

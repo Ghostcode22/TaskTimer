@@ -13,6 +13,7 @@ import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.SetOptions;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import android.content.Context;
 
 public class HabitsViewModel extends ViewModel {
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
@@ -59,7 +60,7 @@ public class HabitsViewModel extends ViewModel {
                 .addOnFailureListener(e -> android.util.Log.e("HabitsVM", "addHabit FAILED", e));
     }
 
-    public void toggleToday(String habitId, boolean checked) {
+    public void toggleToday(Context ctx, String habitId, boolean checked) {
         final String today = new SimpleDateFormat("yyyy-MM-dd", Locale.US).format(new Date());
         final DocumentReference habitDoc = habitsRef().document(habitId);
 
@@ -73,7 +74,6 @@ public class HabitsViewModel extends ViewModel {
             if (today.equals(last)) return null;
 
             Integer streak = (hSnap.getLong("streak") == null) ? 0 : hSnap.getLong("streak").intValue();
-            @SuppressWarnings("unchecked")
             List<Boolean> days = (List<Boolean>) hSnap.get("days");
             if (!Habit.isActiveToday(days)) return null;
 
@@ -85,9 +85,10 @@ public class HabitsViewModel extends ViewModel {
             upd.put("lastCompleted", today);
             trx.set(habitDoc, upd, SetOptions.merge());
             return null;
-        }).addOnSuccessListener(unused ->
-                Rewards.awardHabitCheck(db)
-        ).addOnFailureListener(e ->
+        }).addOnSuccessListener(unused -> {
+                    Rewards.awardHabitCheck(db)
+                            .addOnSuccessListener(v -> Notify.habitCompleted(ctx.getApplicationContext()));
+        }).addOnFailureListener(e ->
                 android.util.Log.e("HabitsVM","toggleToday failed", e)
         );
 

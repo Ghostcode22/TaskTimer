@@ -51,10 +51,12 @@ public class TasksViewModel extends ViewModel {
     }
 
     public void addTask(Task t) {
-        userTasksRef().document(t.getId()).set(t)
-                .addOnSuccessListener(v -> Log.d("TasksVM", "addTask ok: " + t.getId()))
-                .addOnFailureListener(e -> Log.e("TasksVM", "addTask failed", e));
+        userTasksRef().document(t.getId())
+                .set(t, com.google.firebase.firestore.SetOptions.merge())
+                .addOnSuccessListener(v -> android.util.Log.d("TasksVM","addTask OK"))
+                .addOnFailureListener(e -> android.util.Log.e("TasksVM","addTask FAILED", e));
     }
+
 
     public com.google.android.gms.tasks.Task<Void> toggleDone(String id, boolean done) {
         return userTasksRef().document(id).update("done", done);

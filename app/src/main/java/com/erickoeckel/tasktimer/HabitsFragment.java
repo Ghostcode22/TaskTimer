@@ -44,7 +44,9 @@ public class HabitsFragment extends Fragment {
                 .addOnFailureListener(e -> Log.e("HabitsDebug", "probe GET FAILED", e));
 
         RecyclerView rv = v.findViewById(R.id.rvHabits);
-        adapter = new HabitsAdapter((id, checked) -> vm.toggleToday(id, checked));
+        adapter = new HabitsAdapter((id, checked) -> {
+            if (checked) vm.toggleToday(requireContext(), id, true);
+        });
         rv.setLayoutManager(new LinearLayoutManager(getContext()));
         rv.setAdapter(adapter);
 

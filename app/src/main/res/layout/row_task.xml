@@ -16,4 +16,13 @@
         android:layout_weight="1"
         android:paddingStart="8dp"
         android:textSize="16sp"/>
+    <TextView
+        android:id="@+id/tvDue"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="12sp"
+        android:paddingTop="2dp"
+        android:textColor="@color/light_gray"
+        android:visibility="gone"/>
+
 </LinearLayout>

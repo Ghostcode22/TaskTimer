@@ -5,12 +5,15 @@ public class Task {
     private String title;
     private boolean done;
 
+    private String dueDate;
+
     public Task() {}
 
-    public Task(String id, String title, boolean done) {
+    public Task(String id, String title) {
         this.id = id;
         this.title = title;
-        this.done = done;
+        this.done = false;
+        this.dueDate = null;
     }
 
     public String getId() { return id; }
@@ -21,5 +24,9 @@ public class Task {
 
     public boolean isDone() { return done; }
     public void setDone(boolean done) { this.done = done; }
+
+    public String getDueDate() { return dueDate; }
+    public void setDueDate(String dueDate) { this.dueDate = dueDate; }
 }
+
 

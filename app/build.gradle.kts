@@ -49,5 +49,10 @@ dependencies {
     implementation ("androidx.datastore:datastore-core:1.1.1")
     implementation ("org.jetbrains.kotlin:kotlin-stdlib:1.9.24")
     implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.1")
+    implementation ("androidx.work:work-runtime:2.9.0")
+    implementation ("com.google.guava:guava:33.2.1-android")
+    implementation ("com.google.android.gms:play-services-tasks:18.2.0")
+
+
 
 }

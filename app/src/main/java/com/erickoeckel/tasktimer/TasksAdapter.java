@@ -65,8 +65,36 @@ public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.VH> {
                 toggle.onToggle(t.getId(), true);
             }
         });
+
+        TextView tvDue = h.itemView.findViewById(R.id.tvDue);
+        String ymd = t.getDueDate();
+        if (ymd == null || ymd.isEmpty()) {
+            tvDue.setVisibility(View.GONE);
+        } else {
+            tvDue.setVisibility(View.VISIBLE);
+            tvDue.setText("Due " + pretty(ymd));
+
+            String today = new java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.US)
+                    .format(new java.util.Date());
+
+            int color;
+            if (ymd.equals(today)) {
+                color = androidx.core.content.ContextCompat.getColor(tvDue.getContext(), R.color.gold);
+            } else if (ymd.compareTo(today) > 0) {
+                color = androidx.core.content.ContextCompat.getColor(tvDue.getContext(), R.color.light_gray);
+            } else {
+                color = androidx.core.content.ContextCompat.getColor(tvDue.getContext(), R.color.charcoal);
+            }
+            tvDue.setTextColor(color);
+        }
     }
 
+    private static String pretty(String ymd) {
+        try {
+            var in = new java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.US).parse(ymd);
+            return new java.text.SimpleDateFormat("MMM d", java.util.Locale.US).format(in);
+        } catch (Exception e) { return ymd; }
+    }
 
     @Override
     public int getItemCount() { return data.size(); }

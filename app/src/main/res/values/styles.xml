@@ -37,5 +37,33 @@
         <item name="android:textColorHint">@color/light_gray</item>
     </style>
 
+    <!-- Applies only to this dialog -->
+    <style name="ThemeOverlay.TaskTimer.Dialog" parent="ThemeOverlay.Material3.MaterialAlertDialog">
+        <item name="colorSurface">@color/white</item>
+        <item name="colorOnSurface">@color/navy</item>
+        <item name="colorPrimary">@color/charcoal</item>
+        <item name="android:textColorPrimary">@color/navy</item>
+    </style>
 
+    <!-- Nicer outlined box + hint/stroke colors -->
+    <style name="Widget.TaskTimer.TextInputLayout" parent="Widget.Material3.TextInputLayout.OutlinedBox">
+        <item name="android:textColorHint">@color/charcoal</item>
+        <item name="hintTextColor">@color/charcoal</item>
+        <item name="boxStrokeColor">@color/navy</item>
+        <item name="boxStrokeWidth">1dp</item>
+        <item name="boxStrokeWidthFocused">2dp</item>
+    </style>
+
+    <style name="Text.TaskTimer.Input" parent="TextAppearance.Material3.BodyLarge">
+        <item name="android:textColor">@color/navy</item>
+    </style>
+    <!-- Date picker overlay -->
+    <style name="ThemeOverlay.TaskTimer.DatePicker"
+        parent="ThemeOverlay.MaterialComponents.MaterialCalendar">
+        <!-- make numbers/titles readable -->
+        <item name="colorSurface">@color/white</item>
+        <item name="colorOnSurface">@color/navy</item>
+        <item name="colorPrimary">@color/gold</item>
+        <item name="colorOnPrimary">@color/white</item>
+    </style>
 </resources>

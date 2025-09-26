@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent">
+    <LinearLayout
+        android:orientation="vertical" android:padding="16dp"
+        android:layout_width="match_parent" android:layout_height="wrap_content">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnAddFriend"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Add friend" />
+
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:text="Incoming requests" android:textStyle="bold" android:paddingTop="12dp"/>
+        <ListView android:id="@+id/lvIncoming"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:divider="@android:color/transparent" android:dividerHeight="8dp"/>
+
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:text="Outgoing requests" android:textStyle="bold" android:paddingTop="12dp"/>
+        <ListView android:id="@+id/lvOutgoing"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:divider="@android:color/transparent" android:dividerHeight="8dp"/>
+
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:text="Friends" android:textStyle="bold" android:paddingTop="12dp"/>
+        <ListView android:id="@+id/lvFriends"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:divider="@android:color/transparent" android:dividerHeight="8dp"/>
+    </LinearLayout>
+</ScrollView>

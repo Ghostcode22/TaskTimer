@@ -24,5 +24,14 @@
     <fragment
         android:id="@+id/profileFragment"
         android:name="com.erickoeckel.tasktimer.ProfileFragment"
-        android:label="@string/title_profile" />
+        android:label="@string/title_profile" >
+        <action
+            android:id="@+id/action_profileFragment_to_friendsFragment"
+            app:destination="@id/friendsFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/friendsFragment"
+        android:name="com.erickoeckel.tasktimer.FriendsFragment"
+        android:label="Friends" />
 </navigation>

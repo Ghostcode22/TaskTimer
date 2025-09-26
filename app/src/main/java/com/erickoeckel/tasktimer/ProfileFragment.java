@@ -16,6 +16,9 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
+import androidx.navigation.NavController;
+import androidx.navigation.fragment.NavHostFragment;
+
 
 public class ProfileFragment extends Fragment {
     private TextView tvEmail, tvWelcome;
@@ -33,9 +36,9 @@ public class ProfileFragment extends Fragment {
         TextView tvLevel = v.findViewById(R.id.tvLevel);
         TextView tvXp = v.findViewById(R.id.tvXp);
         TextView tvCoins = v.findViewById(R.id.tvCoins);
+        MaterialButton btnFriends = v.findViewById(R.id.btnFriends);
 
         FirebaseFirestore db = FirebaseFirestore.getInstance();
-
         auth = FirebaseAuth.getInstance();
         FirebaseUser user = auth.getCurrentUser();
 
@@ -68,6 +71,11 @@ public class ProfileFragment extends Fragment {
             tvWelcome.setText("Not signed in");
             tvEmail.setText("");
         }
+
+        btnFriends.setOnClickListener(view -> {
+            NavController navController = NavHostFragment.findNavController(ProfileFragment.this);
+            navController.navigate(R.id.action_profileFragment_to_friendsFragment);
+        });
 
         btnSignOut.setOnClickListener(view -> {
             auth.signOut();

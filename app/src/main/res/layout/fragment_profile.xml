@@ -61,10 +61,16 @@
         android:background="@color/soft_gold"/>
 
     <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnFriends"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Friends" />
+
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/btnSignOut"
         android:text="Sign Out"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:backgroundTint="@color/gold"
-        android:textColor="@color/navy"/>
+        android:layout_height="wrap_content"/>
+
+
 </LinearLayout>

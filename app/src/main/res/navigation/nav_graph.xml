@@ -29,7 +29,6 @@
             android:id="@+id/action_profileFragment_to_friendsFragment"
             app:destination="@id/friendsFragment" />
     </fragment>
-
     <fragment
         android:id="@+id/friendsFragment"
         android:name="com.erickoeckel.tasktimer.FriendsFragment"

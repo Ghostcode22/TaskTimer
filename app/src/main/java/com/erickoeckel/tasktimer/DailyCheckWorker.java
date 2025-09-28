@@ -40,8 +40,22 @@ public class DailyCheckWorker extends Worker {
                 }
             }
             if (dueCount > 0) {
-                Notify.habitsDue(getApplicationContext(), dueCount);
-            }
+                AiCoach.generateAndNotify(
+                        getApplicationContext(),
+                        "HABITS_DUE",
+                        null,
+                        Notify.CH_REMINDERS,
+                        dueCount + " habit" + (dueCount==1?"":"s") + " due"
+                );
+            }else {
+            AiCoach.generateAndNotify(
+                    getApplicationContext(),
+                    "TASK_MISSED",
+                    null,
+                    Notify.CH_REMINDERS,
+                    "Missed task"
+            );}
+
 
             var tasksSnap = Tasks.await(db.collection("users").document(uid)
                     .collection("tasks").get());
@@ -53,7 +67,17 @@ public class DailyCheckWorker extends Worker {
                 if (due == null || due.isEmpty()) continue;
                 if (due.compareTo(yesterday) <= 0) {
                     String title = d.getString("title");
-                    Notify.taskMissed(getApplicationContext(), title);
+                    java.util.Map<String, Object> extra2 = new java.util.HashMap<>();
+                    extra2.put("title", title);
+
+                    AiCoach.generateAndNotify(
+                            getApplicationContext(),
+                            "TASK_MISSED",
+                            extra2,
+                            Notify.CH_MISSED,
+                            "Coach nudge"
+                    );
+
                 }
             }
 

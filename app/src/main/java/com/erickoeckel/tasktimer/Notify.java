@@ -147,4 +147,9 @@ public final class Notify {
         push(ctx, (int) System.currentTimeMillis(),
                 base(ctx, CH_MISSED, title, msg));
     }
+
+    public static void show(Context ctx, String channelId, String title, String text) {
+        push(ctx, (int) System.currentTimeMillis(), base(ctx, channelId, title, text));
+    }
+
 }

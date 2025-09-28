@@ -27,8 +27,16 @@ public class TasksFragment extends Fragment {
             vm.completeTask(id)
                     .addOnSuccessListener(unused -> {
                         Rewards.awardTaskCompleted(FirebaseFirestore.getInstance())
-                                .addOnSuccessListener(v2 -> Notify.taskCompleted(requireContext()))
+                                .addOnSuccessListener(v2 -> AiCoach.generateAndNotify(
+                                        requireContext().getApplicationContext(),
+                                        "TASK_COMPLETED",
+                                        null,
+                                        Notify.CH_REWARDS,
+                                        "Task completed!"
+                                ))
                                 .addOnFailureListener(e -> Log.e("Rewards", "awardTaskCompleted failed", e));
+
+
                     })
                     .addOnFailureListener(e -> Log.e("Tasks","completeTask failed", e));
         });

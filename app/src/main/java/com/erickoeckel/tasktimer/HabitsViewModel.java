@@ -1,5 +1,7 @@
 package com.erickoeckel.tasktimer;
 
+import static androidx.lifecycle.AndroidViewModel_androidKt.getApplication;
+
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
@@ -86,8 +88,19 @@ public class HabitsViewModel extends ViewModel {
             trx.set(habitDoc, upd, SetOptions.merge());
             return null;
         }).addOnSuccessListener(unused -> {
-                    Rewards.awardHabitCheck(db)
-                            .addOnSuccessListener(v -> Notify.habitCompleted(ctx.getApplicationContext()));
+            Rewards.awardHabitCheck(db)
+                    .addOnSuccessListener(v2 -> {
+                        AiCoach.generateAndNotify(
+                                ctx.getApplicationContext(),
+                                "HABIT_COMPLETED",
+                                null,
+                                Notify.CH_REWARDS,
+                                "Habit done for today"
+                        );
+                    })
+                    .addOnFailureListener(e ->
+                            android.util.Log.e("HabitsVM", "toggleToday failed", e)
+                    );
         }).addOnFailureListener(e ->
                 android.util.Log.e("HabitsVM","toggleToday failed", e)
         );

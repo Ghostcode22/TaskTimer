@@ -52,6 +52,7 @@ dependencies {
     implementation ("androidx.work:work-runtime:2.9.0")
     implementation ("com.google.guava:guava:33.2.1-android")
     implementation ("com.google.android.gms:play-services-tasks:18.2.0")
+    implementation ("com.google.firebase:firebase-functions")
 
 
 

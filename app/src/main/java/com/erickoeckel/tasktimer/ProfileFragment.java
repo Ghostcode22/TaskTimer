@@ -85,7 +85,6 @@ public class ProfileFragment extends Fragment {
             startActivity(i);
             requireActivity().finish();
         });
-
         return v;
     }
 }

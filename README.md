@@ -1,81 +1,76 @@
-TaskTimer
+# TaskTimer
 
-Introduction:
+> **Development Stage:** **Beta** 
 
-TaskTimer is a gamified focus and habit-tracking app designed to help users manage their time effectively using the Pomodoro technique. Unlike traditional timers, TaskTimer rewards productivity with XP and coins, allowing users to level up avatars, unlock customization items, and build stronger habits.
+TaskTimer is a gamified focus and habit‑tracking app that uses the **Pomodoro technique** and a **reward economy** (XP + coins) to keep users consistent. Users level up, unlock avatar items, and track streaks and stats — all synced with Firebase.
 
+---
 
-Features:
+##  Core Features (Implemented)
+- **Pomodoro Timer:** Custom session and break lengths with session controls.
+- **Gamification:** Earn **XP** and **coins** for completed sessions and habits.
+- **Avatar Customization + Shop:** Spend coins on hairstyles, clothing, and backgrounds.
+- **Progress Tracking:** Session history, streaks, and stats views.
+- **Firebase Integration:** Firestore for real‑time data; Firebase Auth for secure login.
+- **Notifications:** Session start/break reminders and alerts.
 
-Pomodoro Timer – Focus sessions with customizable lengths and built-in breaks.
+---
 
-Gamification – Earn XP and coins for completing sessions and habits.
+##  Current Status
+- Core timer, XP/coin rewards, Auth, Firestore, task creation, and basic stats are **working**.
+- UI/UX theme work and habit tracking are **in progress**.
+- AI suggestion logic is **prototyped** and undergoing testing.
 
-In-App Shop – Use coins to unlock avatar clothing, backgrounds, and themes.
+---
 
-Progress Tracking – View completed tasks, streaks, and statistics.
+##  **This Month’s Work (to prepare for Software Integration user testing next month)**
+1. **Finish Habit Tracker MVP**
+    - Create/complete habits, streak logic, and daily/weekly summaries.
+2. **Economy & Shop Polish**
+    - Balance XP/coin rewards, add starter inventory, persist purchases, and guard against duplicate grants.
+3. **AI Suggestions (MVP)**
+    - Simple rules model for suggesting focus durations and break ratios based on recent history.
+4. **Notifications & Scheduling**
+    - Reliable daily reminders; do‑not‑disturb windows; edge‑case handling across device restarts.
+5. **UI/UX & Accessibility**
+    - Apply final color theme, larger‑tap targets, content descriptions, and TalkBack labels.
 
-AI Suggestions – Personalized recommendations for habit improvement.
+---
 
-Notifications – Stay on track with reminders and session alerts.
+##  **User Testing (Next Month)**
+- Goal: Validate session flow, reward clarity, and habit tracker usability.
+- Success Criteria: task completion in tests.
 
+---
 
-Technologies:
+##  Tech Stack
+- **Android (Java + XML)** for UI and app logic.
+- **Firebase Auth** and **Firestore** for auth and real‑time data.
+- **Android Studio**; **GitHub** with **Gitflow**; **Jira** for planning.
 
-Frontend: Java (Android SDK, XML layouts)
+---
 
-Backend/Database: Firebase Firestore for real-time data storage
+##  Setup
+1. Clone the repo:
+   ```bash
+   git clone https://github.com/<your-username>/TaskTimer.git
+   ```
+2. Open in **Android Studio**.
+3. Add your Firebase `google-services.json` (Auth + Firestore enabled).
+4. **Gradle Sync** → Build & Run on device/emulator.
 
-Authentication: Firebase Auth
+---
 
-Tools: IntelliJ IDEA / Android Studio, GitHub (Gitflow branching), Jira (project management)
+##  Branching Workflow
+| Branch | Purpose |
+| --- | --- |
+| `main` | Production-ready releases |
+| `develop` | Active development |
+| `feature/<name>` | Feature work merged into `develop` |
 
+> Uses **Gitflow** (feature branches → `develop` → release → `main`).
 
-Installation:
+---
 
-1. Clone the repository
-2. Open the project in Android Studio.
-3. Connect your Firebase project (add google-services.json).
-4. Build and run the app on an Android device or emulator.
-
-Development Setup:
-
-For developers contributing to the project:
-
-Use feature-branch workflow (Gitflow).
-
-Run Gradle sync after cloning.
-
-Ensure Firebase is set up with Authentication and Firestore enabled.
-
-
-Branches:
-
-main → Production-ready releases
-
-develop → Active development
-
-Feature branches (feature/xyz) → For new features before merging into develop.
-
-
-License:
-
-This project is licensed under the MIT License.
-
-
-Contributors:
-
-Erick Oeckel – Project Lead & Developer
-
-
-Project Status:
-
-In Development (Alpha)
-
-Core Pomodoro timer working.
-
-Task creation working.
-
-XP/coin system working.
-
-Habit tracker in progress.
+##  License
+MIT

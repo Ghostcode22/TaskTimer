@@ -53,7 +53,7 @@ dependencies {
     implementation ("com.google.guava:guava:33.2.1-android")
     implementation ("com.google.android.gms:play-services-tasks:18.2.0")
     implementation ("com.google.firebase:firebase-functions")
-
-
-
+    implementation("com.github.bumptech.glide:glide:4.16.0")
+    annotationProcessor("com.github.bumptech.glide:compiler:4.16.0")
+    implementation("com.caverock:androidsvg:1.4")
 }

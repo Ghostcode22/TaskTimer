@@ -10,6 +10,7 @@
         android:name="com.erickoeckel.tasktimer.TimerFragment"
         android:label="@string/title_timer"
         app:defaultNavHost="false" />
+
     <fragment
         android:id="@+id/tasksFragment"
         android:name="com.erickoeckel.tasktimer.TasksFragment"
@@ -24,13 +25,24 @@
     <fragment
         android:id="@+id/profileFragment"
         android:name="com.erickoeckel.tasktimer.ProfileFragment"
-        android:label="@string/title_profile" >
+        android:label="@string/title_profile"
+        tools:layout="@layout/fragment_profile">
         <action
             android:id="@+id/action_profileFragment_to_friendsFragment"
             app:destination="@id/friendsFragment" />
+        <action
+            android:id="@+id/action_profile_to_avatarEditor"
+            app:destination="@id/avatarEditorFragment" />
     </fragment>
+
     <fragment
         android:id="@+id/friendsFragment"
         android:name="com.erickoeckel.tasktimer.FriendsFragment"
         android:label="Friends" />
+
+    <fragment
+        android:id="@+id/avatarEditorFragment"
+        android:name="com.erickoeckel.tasktimer.AvatarEditorFragment"
+        android:label="Customize Avatar"
+        tools:layout="@layout/fragment_avatar_editor" />
 </navigation>

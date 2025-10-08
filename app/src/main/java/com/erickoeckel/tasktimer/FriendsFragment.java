@@ -8,6 +8,8 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import java.util.List;
+import androidx.navigation.fragment.NavHostFragment;
+import com.google.android.material.appbar.MaterialToolbar;
 
 public class FriendsFragment extends Fragment {
     private FriendsViewModel vm;
@@ -16,6 +18,11 @@ public class FriendsFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inf, @Nullable ViewGroup c, @Nullable Bundle b) {
         View v = inf.inflate(R.layout.fragment_friends, c, false);
         vm = new ViewModelProvider(requireActivity()).get(FriendsViewModel.class);
+
+        MaterialToolbar tb = v.findViewById(R.id.friendsToolbar);
+        tb.setNavigationOnClickListener(click ->
+                        NavHostFragment.findNavController(this).navigateUp()
+        );
 
         v.findViewById(R.id.btnAddFriend).setOnClickListener(x -> showAddDialog());
 

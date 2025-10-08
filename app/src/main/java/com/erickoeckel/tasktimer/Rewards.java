@@ -42,7 +42,6 @@ public final class Rewards {
         updates.put("xp", FieldValue.increment(xpInc));
         updates.put("coins", FieldValue.increment(coinInc));
         updates.put("updatedAt", FieldValue.serverTimestamp());
-        // set + merge will create the user doc if it doesn't exist yet
         return db.collection("users").document(uid).set(updates, SetOptions.merge());
     }
 

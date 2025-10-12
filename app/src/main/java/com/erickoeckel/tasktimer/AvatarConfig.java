@@ -7,62 +7,108 @@ import java.util.Map;
 
 public class AvatarConfig {
     public String seed = "tasktimer";
-    public String hair = "shortRound";
+
+    // hair/hat
+    public String top = "shortHairShortRound"; // use a real avataaars top
     public String hairColor = "2f2f2f";
+    public String hatColor  = "3d3d3d";
+
+    // face
     public String eyes = "default";
-    public String glasses = "blank";
-    public boolean background = false;
-    public String backgroundColor = "0a2740";
+    public String eyebrows = "default"; // <- plural
+    public String mouth = "default";
+
+    // accessories (glasses, etc.)
+    public String accessories = "blank";
+    public String accessoriesColor = "000000";
+    public boolean accessoriesOn = false;
+
+    // facial hair
+    public String facialHair = "moustacheFancy";
+    public String facialHairColor = "2f2f2f";
+    public boolean facialHairOn = false;
+
+    // skin + background
     public String skinColor  = "f2dbb1";
-    public String clothes = "shirtCrewNeck";
-    public String clothesColor = "3d85c6";
+    public boolean background = false;
+    public String backgroundColor = "0b5394";
 
-    public AvatarConfig() {}
+    // clothing
+    public String clothing = "shirtCrewNeck"; // correct key name
+    public String clothesColor = "8e7cc3";
+    public String clothingGraphic = "skull";  // lowercase slug
 
+    @SuppressWarnings("unchecked")
     public static AvatarConfig from(@Nullable DocumentSnapshot snap) {
         AvatarConfig c = new AvatarConfig();
         if (snap != null && snap.exists()) {
-            Map<String, Object> m = (Map<String, Object>) snap.get("avatarConfig");
-            if (m != null) {
-                c.seed          = get(m, "seed", c.seed);
-                c.hair          = get(m, "hair", c.hair);
-                c.hairColor     = get(m, "hairColor", c.hairColor);
-                c.eyes          = get(m, "eyes", c.eyes);
-                c.glasses       = get(m, "glasses", c.glasses);
-                c.clothes       = get(m, "clothes", c.clothes);
-                c.clothesColor  = get(m, "clothesColor", c.clothesColor);
-                c.background    = getBool(m, "background", c.background);
-                c.backgroundColor = get(m, "backgroundColor", c.backgroundColor);
+            Object raw = snap.get("avatarConfig");
+            if (raw instanceof Map) {
+                Map<String, Object> m = (Map<String, Object>) raw;
+                c.seed = (String) m.getOrDefault("seed", c.seed);
 
-                String legacySkin = get(m, "skin", null);
-                c.skinColor = get(m, "skinColor", (legacySkin != null ? legacySkin : c.skinColor));
+                c.top = (String) m.getOrDefault("top", c.top);
+                c.hairColor = (String) m.getOrDefault("hairColor", c.hairColor);
+                c.hatColor = (String) m.getOrDefault("hatColor", c.hatColor);
+
+                c.eyes = (String) m.getOrDefault("eyes", c.eyes);
+                c.eyebrows = (String) m.getOrDefault("eyebrows", c.eyebrows);
+                c.mouth = (String) m.getOrDefault("mouth", c.mouth);
+
+                c.accessories = (String) m.getOrDefault("accessories", c.accessories);
+                c.accessoriesColor = (String) m.getOrDefault("accessoriesColor", c.accessoriesColor);
+                Object accOn = m.get("accessoriesOn");
+                if (accOn instanceof Boolean) c.accessoriesOn = (Boolean) accOn;
+
+                c.facialHair = (String) m.getOrDefault("facialHair", c.facialHair);
+                c.facialHairColor = (String) m.getOrDefault("facialHairColor", c.facialHairColor);
+                Object fhOn = m.get("facialHairOn");
+                if (fhOn instanceof Boolean) c.facialHairOn = (Boolean) fhOn;
+
+                c.skinColor = (String) m.getOrDefault("skinColor", c.skinColor);
+
+                Object bg = m.get("background");
+                if (bg instanceof Boolean) c.background = (Boolean) bg;
+                c.backgroundColor = (String) m.getOrDefault("backgroundColor", c.backgroundColor);
+
+                // clothing keys (make sure these are the same as toMap)
+                c.clothing = (String) m.getOrDefault("clothing", c.clothing);
+                c.clothesColor = (String) m.getOrDefault("clothesColor", c.clothesColor);
+                c.clothingGraphic = (String) m.getOrDefault("clothingGraphic", c.clothingGraphic);
             }
         }
         return c;
     }
 
-    private static String get(Map<String,Object> m, String k, String def) {
-        Object v = m.get(k);
-        return v instanceof String ? (String) v : def;
-    }
+    public Map<String, Object> toMap() {
+        Map<String, Object> m = new HashMap<>();
+        m.put("seed", seed);
+        m.put("top", top);
+        m.put("hairColor", hairColor);
+        m.put("hatColor", hatColor);
 
-    private static boolean getBool(Map<String,Object> m, String k, boolean def) {
-        Object v = m.get(k);
-        return v instanceof Boolean ? (Boolean) v : def;
-    }
+        m.put("eyes", eyes);
+        m.put("eyebrows", eyebrows);
+        m.put("mouth", mouth);
 
-    public Map<String,Object> toMap() {
-        Map<String,Object> out = new HashMap<>();
-        out.put("seed", seed);
-        out.put("hair", hair);
-        out.put("hairColor", hairColor);
-        out.put("skinColor", skinColor);
-        out.put("eyes", eyes);
-        out.put("glasses", glasses);
-        out.put("clothes", clothes);
-        out.put("clothesColor", clothesColor);
-        out.put("background", background);
-        out.put("backgroundColor", backgroundColor);
-        return out;
+        m.put("accessories", accessories);
+        m.put("accessoriesColor", accessoriesColor);
+        m.put("accessoriesOn", accessoriesOn);
+
+        m.put("facialHair", facialHair);
+        m.put("facialHairColor", facialHairColor);
+        m.put("facialHairOn", facialHairOn);
+
+        m.put("skinColor", skinColor);
+
+        m.put("background", background);
+        m.put("backgroundColor", backgroundColor);
+
+        // clothing keys (match AvatarUrl expectations)
+        m.put("clothing", clothing);
+        m.put("clothesColor", clothesColor);
+        m.put("clothingGraphic", clothingGraphic);
+
+        return m;
     }
 }

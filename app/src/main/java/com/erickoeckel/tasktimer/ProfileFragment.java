@@ -3,6 +3,7 @@ package com.erickoeckel.tasktimer;
 import android.content.Intent;
 import android.graphics.drawable.PictureDrawable;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.*;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -21,6 +22,8 @@ import java.util.Map;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+
 
 public class ProfileFragment extends Fragment {
 
@@ -48,6 +51,30 @@ public class ProfileFragment extends Fragment {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         auth = FirebaseAuth.getInstance();
         FirebaseUser user = auth.getCurrentUser();
+
+        String uid = FirebaseAuth.getInstance().getCurrentUser() != null
+                ? FirebaseAuth.getInstance().getCurrentUser().getUid()
+                : "local";
+
+        FirebaseFirestore.getInstance()
+                .collection("users")
+                .document(uid)
+                .get()
+                .addOnSuccessListener(snap -> {
+                    AvatarConfig cfg = AvatarConfig.from(snap);
+                    // Optional: sanitize like the editor does, in case old data is messy
+                    if (cfg.top != null) {
+                        if ("hat".equals(cfg.top) || cfg.top.startsWith("winterHat")) {
+                            cfg.hairColor = null;
+                        } else if ("noHair".equals(cfg.top)) {
+                            cfg.hairColor = null; cfg.hatColor = null;
+                        } else {
+                            cfg.hatColor = null;
+                        }
+                    }
+                    AvatarSvgLoader.load(ivAvatar, cfg, "PROFILE");
+                })
+                .addOnFailureListener(e -> Log.e("Avatar","Failed to load avatarConfig", e));
 
         if (user != null) {
             tvWelcome.setText("Welcome!");
@@ -108,17 +135,10 @@ public class ProfileFragment extends Fragment {
 
         AvatarConfig cfg = AvatarConfig.from(snap);
         tvAvatarSummary.setText(
-                "Hair: " + cfg.hair + ", Eyes: " + cfg.eyes
+                "Top: " + cfg.top + ", Eyes: " + cfg.eyes
         );
 
-        String url = AvatarUrl.build(cfg, 256);
-        Glide.with(this)
-                .as(PictureDrawable.class)
-                .listener(new SvgSoftwareLayerSetter())
-                .load(url)
-                .placeholder(R.drawable.ic_launcher_foreground)
-                .error(R.drawable.ic_edit_24)
-                .into(ivAvatar);
+        AvatarSvgLoader.load(ivAvatar, cfg, "PROFILE");
 
     }
 

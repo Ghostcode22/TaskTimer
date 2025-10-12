@@ -19,18 +19,14 @@ import java.util.concurrent.Executors;
 public final class AvatarSvgLoader {
 
     private static final String TAG = "Avatar";
-
-    // Single worker is fine; requests are serialized as you edit.
     private static final ExecutorService EXEC = Executors.newSingleThreadExecutor();
     private static final Handler MAIN = new Handler(Looper.getMainLooper());
 
     private AvatarSvgLoader() {}
 
     public static void load(@NonNull ImageView into, @NonNull AvatarConfig cfg, @NonNull String originTag) {
-        // Build URL from cfg (AvatarUrl should already emit v9: top=..., no hair=, no transparent=)
         final String initialUrlRaw = AvatarUrl.build(cfg);
 
-        // Normalize to v9 in case anything slipped through (hair=, transparent=, 7.x base, etc.)
         final String initialUrl = initialUrlRaw;
 
         EXEC.execute(() -> {
@@ -57,7 +53,6 @@ public final class AvatarSvgLoader {
                         .load(finalUrl)
                         .diskCacheStrategy(DiskCacheStrategy.NONE)
                         .skipMemoryCache(true)
-                        // add a changing signature to force-refresh when hair/top changes
                         .signature(new com.bumptech.glide.signature.ObjectKey(
                                 finalUrl + "#" + System.nanoTime()))
                         .into(into);
@@ -65,58 +60,43 @@ public final class AvatarSvgLoader {
         });
     }
 
-
-    /** Normalize a URL to DiceBear avataaars v9 rules. */
     private static String normalizeUrlForAvataaarsV9(String url) {
         String out = url;
 
-        // --- Ensure v9 base ---
         out = out.replace("https://api.dicebear.com/7.x/avataaars/", "https://api.dicebear.com/9.x/avataaars/");
 
-        // --- Remove legacy transparent=... and convert to backgroundColor=transparent if needed ---
-        // If transparent=true → backgroundColor=transparent (unless already set)
         final boolean hadTransparentTrue = out.matches(".*([&?])transparent=true(&|$).*");
-        // Strip any transparent=... entirely
         out = out.replaceAll("([&?])transparent=(true|false)(&|$)", "$1");
 
-        // If caller asked transparent and didn’t already set a backgroundColor, add it
         if (hadTransparentTrue && !out.contains("backgroundColor=")) {
             out = upsertQueryParam(out, "backgroundColor", "transparent");
         }
 
-        // --- Convert any hair=slug (v7-ish) into top=slug (v9) ---
         String hairVal = extractParamValue(out, "hair");
         if (hairVal != null) {
-            // If top not present, promote hair to top
             if (extractParamValue(out, "top") == null) {
                 out = upsertQueryParam(removeQueryParam(out, "hair"), "top", hairVal);
             } else {
-                // top already exists -> drop hair
                 out = removeQueryParam(out, "hair");
             }
         }
 
-        // --- Color constraints ---
         final String topVal = extractParamValue(out, "top");
         final boolean isHat = topVal != null && (topVal.equals("hat") || topVal.startsWith("winterHat"));
         final boolean isNoHair = topVal != null && topVal.equals("noHair");
         final boolean isHairTop = topVal != null && (topVal.startsWith("shortHair") || topVal.startsWith("longHair"));
 
-        // Only allow hairColor with hair tops
         if (!isHairTop) {
             out = out.replaceAll("&hairColor=[A-Fa-f0-9]{6}", "");
         }
-        // Only allow hatColor with hats
         if (!isHat) {
             out = out.replaceAll("&hatColor=[A-Fa-f0-9]{6}", "");
         }
-        // Defensive: if noHair, remove hairColor/hair param remnants
         if (isNoHair) {
             out = out.replaceAll("&hairColor=[A-Fa-f0-9]{6}", "");
             out = removeQueryParam(out, "hair"); // just in case
         }
 
-        // Clean artifacts
         out = out.replace("?&", "?").replace("&&", "&");
         if (out.endsWith("&") || out.endsWith("?")) out = out.substring(0, out.length() - 1);
 
@@ -124,13 +104,7 @@ public final class AvatarSvgLoader {
         return out;
     }
 
-
-
-    // Decide a single best fallback variant, if any.
-    // In AvatarSvgLoader.java
-
     private static String computeFallbackUrl(String url) {
-        // Avataaars-specific: progressively drop optional params most likely to be invalid.
         if (url.contains("&graphicType=")) {
             Log.w(TAG, "[FALLBACK] Removing graphicType …");
             return removeQueryParam(url, "graphicType");
@@ -147,7 +121,6 @@ public final class AvatarSvgLoader {
             Log.w(TAG, "[FALLBACK] Removing hairColor …");
             return removeQueryParam(url, "hairColor");
         }
-        // Final generic: accessories → Blank
         if (url.contains("&accessoriesType=") && !url.contains("accessoriesType=Blank")) {
             Log.w(TAG, "[FALLBACK] Forcing accessoriesType=Blank …");
             return upsertQueryParam(url, "accessoriesType", "Blank");
@@ -155,12 +128,6 @@ public final class AvatarSvgLoader {
         return null;
     }
 
-
-    // -------------------------
-    // Networking helpers
-    // -------------------------
-
-    // Preflight GET with up to 16KB body for debugging; never called on UI thread.
     private static PreflightResult preflight(String urlStr, String originTag, boolean isRetry) {
         HttpURLConnection conn = null;
         try {
@@ -226,7 +193,6 @@ public final class AvatarSvgLoader {
         return (end < 0) ? url.substring(start) : url.substring(start, end);
     }
 
-    // upsert/remove already exist in your class; re-use the same ones you have:
     private static String upsertQueryParam(String url, String key, String value) {
         if (value == null) return url;
         String out = removeQueryParam(url, key);

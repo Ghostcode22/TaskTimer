@@ -1,108 +1,135 @@
 package com.erickoeckel.tasktimer;
 
 import android.content.Context;
+
 import androidx.annotation.NonNull;
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
+
 import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import java.text.SimpleDateFormat;
-import java.util.*;
+import com.google.firebase.firestore.QuerySnapshot;
 
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+
+/**
+ * Daily nudge:
+ *  - Notifies how many habits are scheduled for today and still open.
+ *  - Sends a gentle nudge for tasks that were due in the past and still not done.
+ */
 public class DailyCheckWorker extends Worker {
+
+    private final FirebaseFirestore db = FirebaseFirestore.getInstance();
+    private final String uid;
 
     public DailyCheckWorker(@NonNull Context context, @NonNull WorkerParameters params) {
         super(context, params);
+        this.uid = (FirebaseAuth.getInstance().getCurrentUser() != null)
+                ? FirebaseAuth.getInstance().getCurrentUser().getUid() : null;
     }
 
     @NonNull @Override
     public Result doWork() {
+        if (uid == null) return Result.success();
+
         try {
-            var user = FirebaseAuth.getInstance().getCurrentUser();
-            if (user == null) return Result.success();
-
-            FirebaseFirestore db = FirebaseFirestore.getInstance();
-            String uid = user.getUid();
-            String today = new SimpleDateFormat("yyyy-MM-dd", Locale.US).format(new Date());
-            String yesterday = prevDate(today);
-
-            var habitsSnap = Tasks.await(db.collection("users").document(uid)
-                    .collection("habits").get());
-
-            int dueCount = 0;
-            for (DocumentSnapshot d : habitsSnap.getDocuments()) {
-                List<Boolean> days = (List<Boolean>) d.get("days");
-                String lastCompleted = d.getString("lastCompleted");
-                if (isActiveToday(days) && !today.equals(lastCompleted)) {
-                    dueCount++;
-                }
-            }
-            if (dueCount > 0) {
+            // ----- HABITS DUE TODAY -----
+            int dueHabits = countHabitsDueToday();
+            if (dueHabits > 0) {
+                Map<String, Object> extra = new HashMap<>();
+                extra.put("dueCount", dueHabits);
                 AiCoach.generateAndNotify(
                         getApplicationContext(),
-                        "HABITS_DUE",
-                        null,
+                        AiCoach.EVENT_HABITS_DUE,
+                        extra,
                         Notify.CH_REMINDERS,
-                        dueCount + " habit" + (dueCount==1?"":"s") + " due"
+                        (dueHabits == 1) ? "1 habit due" : (dueHabits + " habits due")
                 );
-            }else {
-            AiCoach.generateAndNotify(
-                    getApplicationContext(),
-                    "TASK_MISSED",
-                    null,
-                    Notify.CH_REMINDERS,
-                    "Missed task"
-            );}
+            }
 
-
-            var tasksSnap = Tasks.await(db.collection("users").document(uid)
-                    .collection("tasks").get());
-
-            for (DocumentSnapshot d : tasksSnap.getDocuments()) {
-                Boolean done = d.getBoolean("done");
-                String due = d.getString("dueDate");
-                if (done != null && done) continue;
-                if (due == null || due.isEmpty()) continue;
-                if (due.compareTo(yesterday) <= 0) {
-                    String title = d.getString("title");
-                    java.util.Map<String, Object> extra2 = new java.util.HashMap<>();
-                    extra2.put("title", title);
-
-                    AiCoach.generateAndNotify(
-                            getApplicationContext(),
-                            "TASK_MISSED",
-                            extra2,
-                            Notify.CH_MISSED,
-                            "Coach nudge"
-                    );
-
-                }
+            // ----- TASKS STILL UNFINISHED PAST DUE -----
+            for (Map<String, Object> ex : getOverdueTasks()) {
+                AiCoach.generateAndNotify(
+                        getApplicationContext(),
+                        AiCoach.EVENT_TASK_MISSED,
+                        ex,
+                        Notify.CH_MISSED,
+                        "Coach nudge"
+                );
             }
 
             return Result.success();
         } catch (Exception e) {
+            e.printStackTrace();
             return Result.retry();
         }
     }
 
-    private static boolean isActiveToday(List<Boolean> days) {
-        if (days == null || days.size() < 7) return true;
-        Calendar c = Calendar.getInstance();
-        int dow = c.get(Calendar.DAY_OF_WEEK);
-        int idx = (dow == Calendar.SUNDAY) ? 0 : (dow - 1);
-        Boolean b = days.get(idx);
-        return b != null && b;
+    // ---------- Habits ----------
+
+    private int countHabitsDueToday() throws Exception {
+        QuerySnapshot qs = Tasks.await(
+                db.collection("users").document(uid).collection("habits").get()
+        );
+        String today = ymd(0);
+        int count = 0;
+        for (DocumentSnapshot d : qs.getDocuments()) {
+            String lastDone = asString(d.get("lastDone"));
+            @SuppressWarnings("unchecked")
+            java.util.List<Boolean> days = (java.util.List<Boolean>) d.get("days"); // [Sun..Sat]
+            boolean activeToday = isActiveToday(days);
+            boolean alreadyDone = today.equals(lastDone);
+            if (activeToday && !alreadyDone) count++;
+        }
+        return count;
     }
 
-    private static String prevDate(String yyyyMmDd) {
-        try {
-            SimpleDateFormat f = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
-            Calendar cal = Calendar.getInstance();
-            cal.setTime(f.parse(yyyyMmDd));
-            cal.add(Calendar.DATE, -1);
-            return f.format(cal.getTime());
-        } catch (Exception e) { return yyyyMmDd; }
+    private static boolean isActiveToday(java.util.List<Boolean> days) {
+        if (days == null || days.size() < 7) return false;
+        int dow = Calendar.getInstance().get(Calendar.DAY_OF_WEEK); // 1=Sun..7=Sat
+        int idx = dow - Calendar.SUNDAY; // 0..6
+        Boolean v = (idx >= 0 && idx < days.size()) ? days.get(idx) : Boolean.FALSE;
+        return Boolean.TRUE.equals(v);
     }
+
+    // ---------- Tasks ----------
+
+    private List<Map<String, Object>> getOverdueTasks() throws Exception {
+        QuerySnapshot qs = Tasks.await(
+                db.collection("users").document(uid).collection("tasks").get()
+        );
+        String today = ymd(0);
+
+        List<Map<String, Object>> out = new ArrayList<>();
+        for (DocumentSnapshot d : qs.getDocuments()) {
+            Boolean done = (d.get("done") instanceof Boolean) ? (Boolean) d.get("done") : Boolean.FALSE;
+            String due = asString(d.get("dueDate"));
+            if (Boolean.TRUE.equals(done)) continue;
+            if (due == null || due.isEmpty()) continue;
+            if (due.compareTo(today) < 0) {
+                Map<String, Object> ex = new HashMap<>();
+                ex.put("title", asString(d.get("title")));
+                out.add(ex);
+            }
+        }
+        return out;
+    }
+
+    // ---------- utils ----------
+
+    private static String ymd(int offsetDays) {
+        Calendar cal = Calendar.getInstance();
+        cal.add(Calendar.DATE, offsetDays);
+        return new SimpleDateFormat("yyyy-MM-dd", Locale.US).format(cal.getTime());
+    }
+    private static String asString(Object o) { return (o == null) ? null : String.valueOf(o); }
 }

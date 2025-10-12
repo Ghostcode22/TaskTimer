@@ -12,11 +12,15 @@ import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.TextView;
+
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FieldPath;
 import com.google.firebase.firestore.FirebaseFirestore;
+
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -27,11 +31,14 @@ public class HabitsAdapter extends RecyclerView.Adapter<HabitsAdapter.VH> {
     private final List<Habit> data = new ArrayList<>();
     private final Toggle toggle;
 
+    // cache of this week's completion docIds per habitId
     private final Map<String, Set<String>> weekCache = new HashMap<>();
 
     public HabitsAdapter(Toggle toggle) { this.toggle = toggle; }
+
     public void submit(List<Habit> list) {
-        data.clear(); weekCache.clear();
+        data.clear();
+        weekCache.clear();               // force re-render of week dots
         if (list != null) data.addAll(list);
         notifyDataSetChanged();
     }
@@ -51,8 +58,7 @@ public class HabitsAdapter extends RecyclerView.Adapter<HabitsAdapter.VH> {
 
     @NonNull @Override
     public VH onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View v = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.row_habit, parent, false);
+        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.row_habit, parent, false);
         return new VH(v);
     }
 
@@ -64,7 +70,7 @@ public class HabitsAdapter extends RecyclerView.Adapter<HabitsAdapter.VH> {
         h.title.setText(hb.getTitle());
         h.streak.setText("🔥 " + hb.getStreak());
 
-        String todayStr = new SimpleDateFormat("yyyy-MM-dd", Locale.US).format(new Date());
+        String todayStr = today();
         boolean isTodayChecked = todayStr.equals(hb.getLastCompleted());
         boolean activeToday    = Habit.isActiveToday(hb.getDays());
         boolean canToggleToday = activeToday && !isTodayChecked;
@@ -76,14 +82,17 @@ public class HabitsAdapter extends RecyclerView.Adapter<HabitsAdapter.VH> {
 
         h.today.setOnCheckedChangeListener((CompoundButton b, boolean checked) -> {
             if (canToggleToday && checked && toggle != null) {
-                toggle.onToggle(hb.getId(), true);   // only allow checking, never unchecking
+                // only allow checking (never unchecking)
+                toggle.onToggle(hb.getId(), true);
             }
         });
 
-        renderDays(h.days, hb.getDays(), hb.getLastCompleted(),null);
+        // initial days render (without completions)
+        renderDays(h.days, hb.getDays(), hb.getLastCompleted(), null);
 
+        // then decorate with this week's completions
         loadWeekCompletions(hb.getId(), set -> {
-            if (!Objects.equals(h.boundHabitId, hb.getId())) return;
+            if (!Objects.equals(h.boundHabitId, hb.getId())) return; // holder recycled
             weekCache.put(hb.getId(), set);
             renderDays(h.days, hb.getDays(), hb.getLastCompleted(), set);
         });
@@ -91,10 +100,31 @@ public class HabitsAdapter extends RecyclerView.Adapter<HabitsAdapter.VH> {
 
     @Override public int getItemCount() { return data.size(); }
 
+    // ---------- extra helpers used by fragment ----------
+
+    public int countRemainingToday() {
+        int n = 0;
+        for (Habit h : data) {
+            if (Habit.isActiveToday(h.getDays()) && !today().equals(h.getLastCompleted())) n++;
+        }
+        return n;
+    }
+
+    public Habit findById(String id) {
+        for (Habit h : data) if (h.getId().equals(id)) return h;
+        return null;
+    }
+
+    // ---------- private rendering / IO ----------
+
+    private static String today() {
+        return new SimpleDateFormat("yyyy-MM-dd", Locale.US).format(new Date());
+    }
+
     private void renderDays(TextView tv, List<Boolean> schedule, String lastCompleted, Set<String> weekCompleted) {
         final String[] letters = {"S","M","T","W","T","F","S"};
 
-        Calendar cal = startOfWeekCalendar(); // set to Sunday of current week
+        Calendar cal = startOfWeekCalendar();
         List<String> weekDates = new ArrayList<>(7);
         SimpleDateFormat f = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
         String todayStr = f.format(new Date());
@@ -149,9 +179,12 @@ public class HabitsAdapter extends RecyclerView.Adapter<HabitsAdapter.VH> {
 
     private static Calendar startOfWeekCalendar() {
         Calendar cal = Calendar.getInstance();
-        cal.set(Calendar.HOUR_OF_DAY, 0); cal.set(Calendar.MINUTE, 0); cal.set(Calendar.SECOND, 0); cal.set(Calendar.MILLISECOND, 0);
+        cal.set(Calendar.HOUR_OF_DAY, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.MILLISECOND, 0);
         int dow = cal.get(Calendar.DAY_OF_WEEK);
-        int daysBack = (dow == Calendar.SUNDAY) ? 0 : dow - Calendar.SUNDAY;
+        int daysBack = (dow == Calendar.SUNDAY) ? 0 : (dow - Calendar.SUNDAY);
         cal.add(Calendar.DATE, -daysBack);
         return cal;
     }
@@ -167,7 +200,7 @@ public class HabitsAdapter extends RecyclerView.Adapter<HabitsAdapter.VH> {
 
         FirebaseFirestore.getInstance()
                 .collection("users")
-                .document(com.google.firebase.auth.FirebaseAuth.getInstance().getCurrentUser().getUid())
+                .document(FirebaseAuth.getInstance().getCurrentUser().getUid())
                 .collection("habits").document(habitId)
                 .collection("completions")
                 .whereGreaterThanOrEqualTo(FieldPath.documentId(), startId)

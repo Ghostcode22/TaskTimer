@@ -7,8 +7,8 @@ public class Habit {
     private String id;
     private String title;
     private List<Boolean> days;
-    private boolean archived;
     private int streak;
+    private int bestStreak;
     private String lastCompleted;
 
     public Habit() {}
@@ -17,8 +17,8 @@ public class Habit {
         this.id = id;
         this.title = title;
         this.days = (days == null) ? new ArrayList<>() : days;
-        this.archived = false;
         this.streak = 0;
+        this.bestStreak = 0;
         this.lastCompleted = null;
     }
 
@@ -46,12 +46,12 @@ public class Habit {
     public List<Boolean> getDays() { return days; }
     public void setDays(List<Boolean> days) { this.days = days; }
 
-    public boolean isArchived() { return archived; }
-    public void setArchived(boolean archived) { this.archived = archived; }
-
     public int getStreak() { return streak; }
     public void setStreak(int streak) { this.streak = streak; }
 
     public String getLastCompleted() { return lastCompleted; }
     public void setLastCompleted(String lastCompleted) { this.lastCompleted = lastCompleted; }
+
+    public int getBestStreak() { return bestStreak; }
+    public void setBestStreak(int bestStreak) { this.bestStreak = bestStreak; }
 }

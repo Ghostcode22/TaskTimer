@@ -8,35 +8,29 @@ import java.util.Map;
 public class AvatarConfig {
     public String seed = "tasktimer";
 
-    // hair/hat
-    public String top = "shortHairShortRound"; // use a real avataaars top
+    public String top = "shortHairShortRound";
     public String hairColor = "2f2f2f";
     public String hatColor  = "3d3d3d";
 
-    // face
     public String eyes = "default";
-    public String eyebrows = "default"; // <- plural
+    public String eyebrows = "default";
     public String mouth = "default";
 
-    // accessories (glasses, etc.)
     public String accessories = "blank";
     public String accessoriesColor = "000000";
     public boolean accessoriesOn = false;
 
-    // facial hair
     public String facialHair = "moustacheFancy";
     public String facialHairColor = "2f2f2f";
     public boolean facialHairOn = false;
 
-    // skin + background
     public String skinColor  = "f2dbb1";
     public boolean background = false;
     public String backgroundColor = "0b5394";
 
-    // clothing
-    public String clothing = "shirtCrewNeck"; // correct key name
+    public String clothing = "shirtCrewNeck";
     public String clothesColor = "8e7cc3";
-    public String clothingGraphic = "skull";  // lowercase slug
+    public String clothingGraphic = "skull";
 
     @SuppressWarnings("unchecked")
     public static AvatarConfig from(@Nullable DocumentSnapshot snap) {
@@ -71,7 +65,6 @@ public class AvatarConfig {
                 if (bg instanceof Boolean) c.background = (Boolean) bg;
                 c.backgroundColor = (String) m.getOrDefault("backgroundColor", c.backgroundColor);
 
-                // clothing keys (make sure these are the same as toMap)
                 c.clothing = (String) m.getOrDefault("clothing", c.clothing);
                 c.clothesColor = (String) m.getOrDefault("clothesColor", c.clothesColor);
                 c.clothingGraphic = (String) m.getOrDefault("clothingGraphic", c.clothingGraphic);
@@ -104,7 +97,6 @@ public class AvatarConfig {
         m.put("background", background);
         m.put("backgroundColor", backgroundColor);
 
-        // clothing keys (match AvatarUrl expectations)
         m.put("clothing", clothing);
         m.put("clothesColor", clothesColor);
         m.put("clothingGraphic", clothingGraphic);

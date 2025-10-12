@@ -62,7 +62,6 @@ public class ProfileFragment extends Fragment {
                 .get()
                 .addOnSuccessListener(snap -> {
                     AvatarConfig cfg = AvatarConfig.from(snap);
-                    // Optional: sanitize like the editor does, in case old data is messy
                     if (cfg.top != null) {
                         if ("hat".equals(cfg.top) || cfg.top.startsWith("winterHat")) {
                             cfg.hairColor = null;

@@ -12,15 +12,12 @@ import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.TextView;
-
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
-
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FieldPath;
 import com.google.firebase.firestore.FirebaseFirestore;
-
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -31,14 +28,13 @@ public class HabitsAdapter extends RecyclerView.Adapter<HabitsAdapter.VH> {
     private final List<Habit> data = new ArrayList<>();
     private final Toggle toggle;
 
-    // cache of this week's completion docIds per habitId
     private final Map<String, Set<String>> weekCache = new HashMap<>();
 
     public HabitsAdapter(Toggle toggle) { this.toggle = toggle; }
 
     public void submit(List<Habit> list) {
         data.clear();
-        weekCache.clear();               // force re-render of week dots
+        weekCache.clear();
         if (list != null) data.addAll(list);
         notifyDataSetChanged();
     }
@@ -82,40 +78,20 @@ public class HabitsAdapter extends RecyclerView.Adapter<HabitsAdapter.VH> {
 
         h.today.setOnCheckedChangeListener((CompoundButton b, boolean checked) -> {
             if (canToggleToday && checked && toggle != null) {
-                // only allow checking (never unchecking)
                 toggle.onToggle(hb.getId(), true);
             }
         });
 
-        // initial days render (without completions)
         renderDays(h.days, hb.getDays(), hb.getLastCompleted(), null);
 
-        // then decorate with this week's completions
         loadWeekCompletions(hb.getId(), set -> {
-            if (!Objects.equals(h.boundHabitId, hb.getId())) return; // holder recycled
+            if (!Objects.equals(h.boundHabitId, hb.getId())) return;
             weekCache.put(hb.getId(), set);
             renderDays(h.days, hb.getDays(), hb.getLastCompleted(), set);
         });
     }
 
     @Override public int getItemCount() { return data.size(); }
-
-    // ---------- extra helpers used by fragment ----------
-
-    public int countRemainingToday() {
-        int n = 0;
-        for (Habit h : data) {
-            if (Habit.isActiveToday(h.getDays()) && !today().equals(h.getLastCompleted())) n++;
-        }
-        return n;
-    }
-
-    public Habit findById(String id) {
-        for (Habit h : data) if (h.getId().equals(id)) return h;
-        return null;
-    }
-
-    // ---------- private rendering / IO ----------
 
     private static String today() {
         return new SimpleDateFormat("yyyy-MM-dd", Locale.US).format(new Date());

@@ -29,9 +29,9 @@ public class Habit {
     }
 
     public static boolean isActiveToday(java.util.List<Boolean> days) {
-        if (days == null || days.size() < 7) return true; // default to active if not configured
+        if (days == null || days.size() < 7) return true;
         java.util.Calendar c = java.util.Calendar.getInstance();
-        int dow = c.get(java.util.Calendar.DAY_OF_WEEK); // 1=Sun..7=Sat
+        int dow = c.get(java.util.Calendar.DAY_OF_WEEK);
         int idx = (dow == java.util.Calendar.SUNDAY) ? 0 : (dow - 1);
         Boolean b = days.get(idx);
         return b != null && b;

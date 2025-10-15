@@ -45,7 +45,6 @@
                 android:layout_marginTop="12dp"
                 android:contentDescription="@string/app_name" />
 
-            <!-- Hair / Hat (topType + hairColor + hatColor) -->
             <LinearLayout
                 android:id="@+id/groupHair"
                 android:orientation="vertical"
@@ -65,7 +64,6 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp">
 
-                    <!-- cycles ShortHair*/LongHair*/NoHair/Hat/WinterHat*/Hijab/Turban -->
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btnNextTopType"
                         style="?attr/materialButtonOutlinedStyle"
@@ -74,7 +72,6 @@
                         android:layout_weight="1"
                         android:text="Next topType" />
 
-                    <!-- only used when topType is a hair style (not NoHair/Hat) -->
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btnHairColor"
                         style="?attr/materialButtonOutlinedStyle"
@@ -85,7 +82,6 @@
                 </LinearLayout>
             </LinearLayout>
 
-            <!-- Accessories (accessoriesType only) -->
             <LinearLayout
                 android:id="@+id/groupAccessories"
                 android:orientation="vertical"
@@ -108,7 +104,6 @@
                     android:text="Next accessoriesType" />
             </LinearLayout>
 
-            <!-- Clothes (clotheType, clotheColor, graphicType) -->
             <LinearLayout
                 android:id="@+id/groupClothes"
                 android:orientation="vertical"
@@ -154,7 +149,6 @@
                     android:text="Next graphicType (GraphicShirt only)" />
             </LinearLayout>
 
-            <!-- Face (eyeType, eyebrowType, mouthType, facialHairType, facialHairColor) -->
             <LinearLayout
                 android:id="@+id/groupFace"
                 android:orientation="vertical"
@@ -223,7 +217,6 @@
                 </LinearLayout>
             </LinearLayout>
 
-            <!-- Avatar style + Skin -->
             <LinearLayout
                 android:orientation="horizontal"
                 android:layout_width="match_parent"

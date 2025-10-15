@@ -1,31 +1,23 @@
 package com.erickoeckel.tasktimer;
 
 import android.content.Context;
-
 import androidx.annotation.NonNull;
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
-
 import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
-
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-/**
- * Daily nudge:
- *  - Notifies how many habits are scheduled for today and still open.
- *  - Sends a gentle nudge for tasks that were due in the past and still not done.
- */
+
 public class DailyCheckWorker extends Worker {
 
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
@@ -42,7 +34,6 @@ public class DailyCheckWorker extends Worker {
         if (uid == null) return Result.success();
 
         try {
-            // ----- HABITS DUE TODAY -----
             int dueHabits = countHabitsDueToday();
             if (dueHabits > 0) {
                 Map<String, Object> extra = new HashMap<>();
@@ -56,7 +47,6 @@ public class DailyCheckWorker extends Worker {
                 );
             }
 
-            // ----- TASKS STILL UNFINISHED PAST DUE -----
             for (Map<String, Object> ex : getOverdueTasks()) {
                 AiCoach.generateAndNotify(
                         getApplicationContext(),
@@ -74,8 +64,6 @@ public class DailyCheckWorker extends Worker {
         }
     }
 
-    // ---------- Habits ----------
-
     private int countHabitsDueToday() throws Exception {
         QuerySnapshot qs = Tasks.await(
                 db.collection("users").document(uid).collection("habits").get()
@@ -85,7 +73,7 @@ public class DailyCheckWorker extends Worker {
         for (DocumentSnapshot d : qs.getDocuments()) {
             String lastDone = asString(d.get("lastDone"));
             @SuppressWarnings("unchecked")
-            java.util.List<Boolean> days = (java.util.List<Boolean>) d.get("days"); // [Sun..Sat]
+            java.util.List<Boolean> days = (java.util.List<Boolean>) d.get("days");
             boolean activeToday = isActiveToday(days);
             boolean alreadyDone = today.equals(lastDone);
             if (activeToday && !alreadyDone) count++;
@@ -100,8 +88,6 @@ public class DailyCheckWorker extends Worker {
         Boolean v = (idx >= 0 && idx < days.size()) ? days.get(idx) : Boolean.FALSE;
         return Boolean.TRUE.equals(v);
     }
-
-    // ---------- Tasks ----------
 
     private List<Map<String, Object>> getOverdueTasks() throws Exception {
         QuerySnapshot qs = Tasks.await(
@@ -123,8 +109,6 @@ public class DailyCheckWorker extends Worker {
         }
         return out;
     }
-
-    // ---------- utils ----------
 
     private static String ymd(int offsetDays) {
         Calendar cal = Calendar.getInstance();

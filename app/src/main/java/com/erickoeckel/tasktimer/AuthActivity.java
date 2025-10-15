@@ -24,7 +24,6 @@ public class AuthActivity extends AppCompatActivity {
     private MaterialButtonToggleGroup toggle;
     private ProgressBar progress;
     private TextView tvError;
-
     private boolean isRegister = false;
     private FirebaseAuth auth;
     private FirebaseFirestore db;
@@ -83,7 +82,7 @@ public class AuthActivity extends AppCompatActivity {
                                         .addOnSuccessListener(unused -> goToApp())
                                         .addOnFailureListener(e -> {
                                             showError("Account created, but profile save failed: " + e.getMessage());
-                                            goToApp(); // still proceed
+                                            goToApp();
                                         });
                             } else {
                                 goToApp();

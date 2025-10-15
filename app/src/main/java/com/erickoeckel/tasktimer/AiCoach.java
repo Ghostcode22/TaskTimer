@@ -7,42 +7,22 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.text.TextUtils;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.ContextCompat;
-
 import com.google.firebase.functions.FirebaseFunctions;
 import com.google.firebase.functions.HttpsCallableResult;
-
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Random;
 
-/**
- * AI-powered coach. Sends event + context to a Cloud Function ("coachMessage")
- * which returns a short encouraging message. Falls back to local wording if needed.
- *
- * Extras you can pass (examples):
- *  - TASK_COMPLETED:   taskTitle(String), tasksLeft(int)
- *  - HABIT_COMPLETED:  habitTitle(String), streak(int), habitsLeft(int)
- *  - HABITS_DUE:       dueCount(int)
- *  - TASK_MISSED:      title(String)
- *
- * Usage:
- *   Map<String,Object> extra = new HashMap<>();
- *   extra.put("taskTitle", "Write outline");
- *   extra.put("tasksLeft", 2);
- *   AiCoach.generateAndNotify(ctx, AiCoach.EVENT_TASK_COMPLETED, extra, Notify.CH_REWARDS, "Task completed!");
- */
 public final class AiCoach {
 
     private AiCoach() {}
 
-    // Events
     public static final String EVENT_TASK_COMPLETED  = "TASK_COMPLETED";
     public static final String EVENT_HABIT_COMPLETED = "HABIT_COMPLETED";
     public static final String EVENT_TASK_MISSED     = "TASK_MISSED";
@@ -50,7 +30,6 @@ public final class AiCoach {
 
     private static final Random RNG = new Random();
 
-    /** Main entry: ask AI for copy; fall back locally; then show a notification. */
     public static void generateAndNotify(
             @NonNull Context ctx,
             @NonNull String event,
@@ -58,14 +37,12 @@ public final class AiCoach {
             @NonNull String channelId,
             @NonNull String title
     ) {
-        // Build payload for Cloud Function
         Map<String, Object> payload = new HashMap<>();
         payload.put("event", event);
 
         Map<String, Object> x = (extra == null) ? new HashMap<>() : new HashMap<>(extra);
-        // Non-identifying context the AI can use (optional, safe)
         x.put("locale", Locale.getDefault().toLanguageTag());
-        x.put("timeOfDay", timeOfDay()); // morning/afternoon/evening
+        x.put("timeOfDay", timeOfDay());
         payload.put("extra", x);
 
         FirebaseFunctions.getInstance("us-central1")
@@ -74,44 +51,16 @@ public final class AiCoach {
                 .addOnSuccessListener((HttpsCallableResult r) -> {
                     String msg = extractMessage(r);
                     if (TextUtils.isEmpty(msg)) {
-                        msg = coachText(event, extra); // fallback if AI returned nothing
+                        msg = coachText(event, extra);
                     }
                     showNotification(ctx, channelId, title, msg);
                 })
                 .addOnFailureListener(e -> {
-                    // Offline / function error → local copy
                     String msg = coachText(event, extra);
                     showNotification(ctx, channelId, title, msg);
                 });
     }
 
-    /** Simple Q&A helper (kept from your “Before”). */
-    public static com.google.android.gms.tasks.Task<String> ask(
-            Context ctx,
-            String question,
-            @Nullable Map<String, Object> extra
-    ) {
-        Map<String, Object> payload = new HashMap<>();
-        payload.put("event", "ASK");
-        payload.put("question", question);
-        if (extra != null) payload.put("extra", extra);
-
-        return FirebaseFunctions.getInstance("us-central1")
-                .getHttpsCallable("coachMessage")
-                .call(payload)
-                .continueWith(task -> {
-                    Object data = (task.getResult() != null) ? task.getResult().getData() : null;
-                    if (data instanceof Map) {
-                        Object m = ((Map<?, ?>) data).get("message");
-                        return m != null ? String.valueOf(m) : "";
-                    }
-                    return data != null ? String.valueOf(data) : "";
-                });
-    }
-
-    // ---------- Helpers ----------
-
-    /** Local phrasing used as an offline/empty fallback. */
     @NonNull
     private static String coachText(@NonNull String event, @Nullable Map<String, Object> extra) {
         Map<String, Object> x = (extra == null) ? new HashMap<>() : extra;
@@ -159,7 +108,6 @@ public final class AiCoach {
     }
 
     private static void showNotification(Context ctx, String channelId, String title, String body) {
-        // Tap → open app
         Intent launch = new Intent(ctx, MainActivity.class)
                 .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
         PendingIntent pi = PendingIntent.getActivity(
@@ -177,7 +125,6 @@ public final class AiCoach {
 
         Notification n = b.build();
 
-        // Android 13+ permission guard
         if (ContextCompat.checkSelfPermission(ctx, Manifest.permission.POST_NOTIFICATIONS)
                 != PackageManager.PERMISSION_GRANTED) {
             return;
@@ -185,7 +132,7 @@ public final class AiCoach {
         try {
             NotificationManagerCompat.from(ctx)
                     .notify((int) (System.currentTimeMillis() & 0xFFFFFFF), n);
-        } catch (SecurityException ignored) { /* notifications disabled at OS level */ }
+        } catch (SecurityException ignored) {}
     }
 
     private static String extractMessage(HttpsCallableResult r) {
@@ -205,7 +152,6 @@ public final class AiCoach {
         return "evening";
     }
 
-    // local utils
     private static String pick(String... variants) { return variants[RNG.nextInt(variants.length)]; }
     private static String s(Object o, String d) {
         String v = (o == null) ? null : String.valueOf(o);

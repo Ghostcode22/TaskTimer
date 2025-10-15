@@ -22,30 +22,6 @@ public final class Notify {
     public static final String CH_MISSED    = "missed";
     public static final String CH_SOCIAL = "social";
 
-    private static final String[] MSG_TASK_DONE = new String[]{
-            "Nice! One more task down!",
-            "You’re on a roll—keep going!",
-            "That’s how progress looks!",
-            "Another brick laid. Well done!"
-    };
-    private static final String[] MSG_HABIT_DONE = new String[]{
-            "Habit hit—streak rising!",
-            "Tiny wins, big momentum!",
-            "Consistency unlocked. Great job!",
-            "You showed up today!"
-    };
-    private static final String[] MSG_REMIND = new String[]{
-            "A few habits are due today—grab an easy win!",
-            "Your routine is calling. Quick check-in?",
-            "Today’s habits are queued. You got this!",
-            "Small steps today → big wins later."
-    };
-    private static final String[] MSG_MISSED = new String[]{
-            "Missed one yesterday—no sweat. Start fresh today!",
-            "Progress isn’t linear—pick it back up!",
-            "Reset button pressed. One step today.",
-            "Yesterday is data. Today is action."
-    };
     private static final String[] MSG_FRIEND_REQ = {
             "sent you a friend request.",
             "wants to connect with you!",
@@ -122,34 +98,4 @@ public final class Notify {
         }
         NotificationManagerCompat.from(ctx.getApplicationContext()).notify(id, b.build());
     }
-
-    public static void taskCompleted(Context ctx) {
-        String msg = MSG_TASK_DONE[R.nextInt(MSG_TASK_DONE.length)];
-        push(ctx, (int) System.currentTimeMillis(),
-                base(ctx, CH_REWARDS, "Task completed!", msg));
-    }
-
-    public static void habitCompleted(Context ctx) {
-        String msg = MSG_HABIT_DONE[R.nextInt(MSG_HABIT_DONE.length)];
-        push(ctx, (int) System.currentTimeMillis(),
-                base(ctx, CH_REWARDS, "Habit done for today", msg));
-    }
-
-    public static void habitsDue(Context ctx, int count) {
-        String msg = MSG_REMIND[R.nextInt(MSG_REMIND.length)] + " (" + count + " due)";
-        push(ctx, (int) System.currentTimeMillis(),
-                base(ctx, CH_REMINDERS, "Habits due today", msg));
-    }
-
-    public static void taskMissed(Context ctx, String titleMaybe) {
-        String msg = MSG_MISSED[R.nextInt(MSG_MISSED.length)];
-        String title = (titleMaybe == null || titleMaybe.isEmpty()) ? "Missed task" : ("Missed: " + titleMaybe);
-        push(ctx, (int) System.currentTimeMillis(),
-                base(ctx, CH_MISSED, title, msg));
-    }
-
-    public static void show(Context ctx, String channelId, String title, String text) {
-        push(ctx, (int) System.currentTimeMillis(), base(ctx, channelId, title, text));
-    }
-
 }

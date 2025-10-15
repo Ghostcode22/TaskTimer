@@ -5,7 +5,7 @@ import android.util.Log;
 
 final class AvatarUrl {
     private static final String TAG  = "Avatar";
-    private static final String BASE = "https://avataaars.io/"; // <- avataaars.io root
+    private static final String BASE = "https://avataaars.io/";
 
     static String build(AvatarConfig c) {
         if (c == null) c = new AvatarConfig();

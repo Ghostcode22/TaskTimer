@@ -10,9 +10,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
-
 import com.google.firebase.firestore.FirebaseFirestore;
-
 import java.util.Locale;
 
 public class TimerFragment extends Fragment {

@@ -5,16 +5,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
-import java.util.HashMap;
-import java.util.Map;
 
 public class HabitsFragment extends Fragment {
 
@@ -51,11 +47,11 @@ public class HabitsFragment extends Fragment {
 
         rv.setAdapter(adapter);
 
-        final TextView tvEmpty = v.findViewById(R.id.tvEmpty);
 
         vm.getHabits().observe(getViewLifecycleOwner(), list -> {
             adapter.submit(list);
             boolean isEmpty = (list == null || list.isEmpty());
+            final TextView tvEmpty = v.findViewById(R.id.tvEmpty);
             tvEmpty.setVisibility(isEmpty ? View.VISIBLE : View.GONE);
         });
 

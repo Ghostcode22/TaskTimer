@@ -4,7 +4,6 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
-
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
@@ -12,7 +11,6 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
-
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -26,8 +24,6 @@ public class HabitsViewModel extends ViewModel {
     public LiveData<List<Habit>> getHabits() { return _habits; }
 
     public HabitsViewModel() { load(); }
-
-    // ---------- loading ----------
 
     public void load() {
         db.collection("users").document(uid).collection("habits")
@@ -43,13 +39,7 @@ public class HabitsViewModel extends ViewModel {
         _habits.setValue(list);
     }
 
-    /** Called by UI; we only handle checked=true. */
-    public void toggleToday(@NonNull String habitId, boolean checked) {
-        if (!checked) return;
-        completeToday(habitId);
-    }
     public com.google.android.gms.tasks.Task<Void> addHabit(@NonNull Habit h) {
-        // Persist to Firestore
         Map<String, Object> doc = new HashMap<>();
         doc.put("name",        h.getTitle());
         doc.put("days",        h.getDays() == null ? java.util.Collections.emptyList() : h.getDays());
@@ -74,7 +64,6 @@ public class HabitsViewModel extends ViewModel {
         final DocumentReference doc = db.collection("users").document(uid)
                 .collection("habits").document(habitId);
 
-        // Do a small transaction to compute streak/bestStreak correctly
         return db.runTransaction(trx -> {
             DocumentSnapshot snap = trx.get(doc);
             int prevStreak   = intOf(snap.get("streak"));
@@ -83,11 +72,11 @@ public class HabitsViewModel extends ViewModel {
 
             int newStreak;
             if (today.equals(lastDone)) {
-                newStreak = prevStreak;           // already counted today
+                newStreak = prevStreak;
             } else if (yesterday().equals(lastDone)) {
                 newStreak = Math.max(1, prevStreak + 1);
             } else {
-                newStreak = 1;                    // reset
+                newStreak = 1;
             }
             int newBest = Math.max(prevBest, newStreak);
 
@@ -98,7 +87,6 @@ public class HabitsViewModel extends ViewModel {
             up.put("updatedAt", FieldValue.serverTimestamp());
             trx.update(doc, up);
 
-            // also write a completion marker for the ribbon UI
             DocumentReference comp = doc.collection("completions").document(today);
             Map<String, Object> payload = new HashMap<>();
             payload.put("ts", FieldValue.serverTimestamp());
@@ -106,19 +94,17 @@ public class HabitsViewModel extends ViewModel {
 
             return null;
         }).continueWithTask(t -> {
-            // refresh the local cache
             return db.collection("users").document(uid)
                     .collection("habits").get()
                     .addOnSuccessListener(this::applySnapshot)
                     .continueWith(tt -> null);
         });
     }
-    // ➊ Add inside HabitsViewModel (top-level members stay as you have them)
 
     public static final class HabitCompletedInfo {
         public final String habitTitle;
         public final int streak;
-        public final int habitsLeft; // scheduled for today, still not logged
+        public final int habitsLeft;
         HabitCompletedInfo(String habitTitle, int streak, int habitsLeft) {
             this.habitTitle = habitTitle;
             this.streak = streak;
@@ -126,7 +112,6 @@ public class HabitsViewModel extends ViewModel {
         }
     }
 
-    // ➋ Make sure habitFrom() also reads days so we can compute "left today"
     @SuppressWarnings("unchecked")
     private static Habit habitFrom(DocumentSnapshot d) {
         Habit h = new Habit();
@@ -135,7 +120,6 @@ public class HabitsViewModel extends ViewModel {
         h.setStreak(intOf(d.get("streak")));
         h.setBestStreak(intOf(d.get("bestStreak")));
         h.setLastCompleted(safe((String) d.get("lastDone"), null));
-        // NEW: keep schedule (Sun..Sat booleans)
         Object daysObj = d.get("days");
         if (daysObj instanceof java.util.List) {
             h.setDays((java.util.List<Boolean>) daysObj);
@@ -143,7 +127,6 @@ public class HabitsViewModel extends ViewModel {
         return h;
     }
 
-    // ➌ Helper to count only scheduled-left-today
     private static int countScheduledLeftToday(java.util.List<Habit> list, String today) {
         if (list == null) return 0;
         int left = 0;
@@ -153,7 +136,6 @@ public class HabitsViewModel extends ViewModel {
         return left;
     }
 
-    // ➍ NEW: completes today, refreshes, and returns fresh info for notifications
     public com.google.android.gms.tasks.Task<HabitCompletedInfo> completeTodayWithInfo(@NonNull String habitId) {
         String today = new java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.US).format(new java.util.Date());
         java.util.Map<String, Object> up = new java.util.HashMap<>();
@@ -168,10 +150,9 @@ public class HabitsViewModel extends ViewModel {
                     com.google.firebase.firestore.QuerySnapshot qs = task.getResult();
                     java.util.List<Habit> list = new java.util.ArrayList<>();
                     for (DocumentSnapshot d : qs.getDocuments()) list.add(habitFrom(d));
-                    // push fresh list
+
                     _habits.postValue(list);
 
-                    // find updated habit
                     Habit target = null;
                     for (Habit h : list) if (habitId.equals(h.getId())) { target = h; break; }
 
@@ -182,9 +163,6 @@ public class HabitsViewModel extends ViewModel {
                     return new HabitCompletedInfo(title, streak, left);
                 });
     }
-
-
-    // ---------- utils ----------
 
     private static int intOf(Object o) { return (o instanceof Number) ? ((Number) o).intValue() : 0; }
     private static String safe(String s, String d) { return (s == null || s.isEmpty()) ? d : s; }

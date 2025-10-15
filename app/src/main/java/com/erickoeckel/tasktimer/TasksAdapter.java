@@ -6,10 +6,8 @@ import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.TextView;
-
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -59,9 +57,40 @@ public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.VH> {
                 toggle.onToggle(t.getId(), true);
             }
         });
+        TextView tvDue = h.itemView.findViewById(R.id.tvDue);
+        String ymd = t.getDueDate(); // must be "yyyy-MM-dd"
+        if (ymd == null || ymd.trim().isEmpty()) {
+            tvDue.setVisibility(View.GONE);
+        } else {
+            tvDue.setVisibility(View.VISIBLE);
+            tvDue.setText("Due " + pretty(ymd));
 
-        // (keep your due-date styling if you had it here)
+            String today = new java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.US)
+                    .format(new java.util.Date());
+
+            int color;
+            if (ymd.equals(today)) {
+                color = androidx.core.content.ContextCompat.getColor(tvDue.getContext(), R.color.gold);
+            } else if (ymd.compareTo(today) > 0) {
+                color = androidx.core.content.ContextCompat.getColor(tvDue.getContext(), R.color.light_gray);
+            } else {
+                color = androidx.core.content.ContextCompat.getColor(tvDue.getContext(), R.color.charcoal);
+            }
+            tvDue.setTextColor(color);
+        }
     }
+
+    private static String pretty(String ymd) {
+        try {
+            java.text.SimpleDateFormat in = new java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.US);
+            java.util.Date d = in.parse(ymd);
+            java.text.SimpleDateFormat out = new java.text.SimpleDateFormat("MMM d", java.util.Locale.US);
+            return out.format(d);
+        } catch (Exception e) {
+            return ymd;
+        }
+    }
+
 
     @Override
     public int getItemCount() { return data.size(); }

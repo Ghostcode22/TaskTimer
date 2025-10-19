@@ -5,7 +5,6 @@ import androidx.annotation.Nullable;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
-
 import android.util.Log;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
@@ -66,6 +65,7 @@ public class TasksViewModel extends ViewModel {
     }
 
     public com.google.android.gms.tasks.Task<Void> completeTask(@NonNull String id) {
+        Rewards.awardTaskCompleted(db);
         return userTasksRef().document(id).update("done", true);
     }
 

@@ -45,4 +45,11 @@
         android:name="com.erickoeckel.tasktimer.AvatarEditorFragment"
         android:label="Customize Avatar"
         tools:layout="@layout/fragment_avatar_editor" />
+
+    <fragment
+        android:id="@+id/shopFragment"
+        android:name="com.erickoeckel.tasktimer.ShopFragment"
+        android:label="Shop"
+        tools:layout="@layout/fragment_shop" />
+
 </navigation>

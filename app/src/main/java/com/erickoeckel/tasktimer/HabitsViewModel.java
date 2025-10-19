@@ -6,12 +6,9 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class HabitsViewModel extends ViewModel {
@@ -39,7 +36,7 @@ public class HabitsViewModel extends ViewModel {
         _habits.setValue(list);
     }
 
-    public com.google.android.gms.tasks.Task<Void> addHabit(@NonNull Habit h) {
+    public Task<Void> addHabit(@NonNull Habit h) {
         Map<String, Object> doc = new HashMap<>();
         doc.put("name",        h.getTitle());
         doc.put("days",        h.getDays() == null ? java.util.Collections.emptyList() : h.getDays());
@@ -57,48 +54,6 @@ public class HabitsViewModel extends ViewModel {
                             .addOnSuccessListener(this::applySnapshot)
                             .continueWith(tt -> null);
                 });
-    }
-
-    public Task<Void> completeToday(@NonNull String habitId) {
-        final String today = today();
-        final DocumentReference doc = db.collection("users").document(uid)
-                .collection("habits").document(habitId);
-
-        return db.runTransaction(trx -> {
-            DocumentSnapshot snap = trx.get(doc);
-            int prevStreak   = intOf(snap.get("streak"));
-            int prevBest     = intOf(snap.get("bestStreak"));
-            String lastDone  = safe((String) snap.get("lastDone"), null);
-
-            int newStreak;
-            if (today.equals(lastDone)) {
-                newStreak = prevStreak;
-            } else if (yesterday().equals(lastDone)) {
-                newStreak = Math.max(1, prevStreak + 1);
-            } else {
-                newStreak = 1;
-            }
-            int newBest = Math.max(prevBest, newStreak);
-
-            Map<String, Object> up = new HashMap<>();
-            up.put("lastDone", today);
-            up.put("streak", newStreak);
-            up.put("bestStreak", newBest);
-            up.put("updatedAt", FieldValue.serverTimestamp());
-            trx.update(doc, up);
-
-            DocumentReference comp = doc.collection("completions").document(today);
-            Map<String, Object> payload = new HashMap<>();
-            payload.put("ts", FieldValue.serverTimestamp());
-            trx.set(comp, payload);
-
-            return null;
-        }).continueWithTask(t -> {
-            return db.collection("users").document(uid)
-                    .collection("habits").get()
-                    .addOnSuccessListener(this::applySnapshot)
-                    .continueWith(tt -> null);
-        });
     }
 
     public static final class HabitCompletedInfo {
@@ -141,6 +96,7 @@ public class HabitsViewModel extends ViewModel {
         java.util.Map<String, Object> up = new java.util.HashMap<>();
         up.put("lastDone", today);
         up.put("streak", com.google.firebase.firestore.FieldValue.increment(1));
+        Rewards.awardHabitCheck(db);
 
         return db.collection("users").document(uid)
                 .collection("habits").document(habitId)
@@ -166,11 +122,4 @@ public class HabitsViewModel extends ViewModel {
 
     private static int intOf(Object o) { return (o instanceof Number) ? ((Number) o).intValue() : 0; }
     private static String safe(String s, String d) { return (s == null || s.isEmpty()) ? d : s; }
-
-    private static String today()     { return new SimpleDateFormat("yyyy-MM-dd", Locale.US).format(new Date()); }
-    private static String yesterday() {
-        Calendar c = Calendar.getInstance();
-        c.add(Calendar.DATE, -1);
-        return new SimpleDateFormat("yyyy-MM-dd", Locale.US).format(c.getTime());
-    }
 }

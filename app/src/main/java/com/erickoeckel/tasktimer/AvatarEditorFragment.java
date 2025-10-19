@@ -12,77 +12,44 @@ import androidx.fragment.app.Fragment;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.tabs.TabLayout;
+import com.google.android.material.textfield.MaterialAutoCompleteTextView;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.ListenerRegistration;
+import android.widget.ArrayAdapter;
+import android.widget.Toast;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class AvatarEditorFragment extends Fragment {
 
     private static final String TAG = "Avatar";
 
     private static final String[] TOPS = {
-            "NoHair",
-            "Eyepatch",
-            "Hat",
-            "Hijab",
-            "Turban",
-            "LongHairBigHair",
-            "LongHairBob",
-            "LongHairBun",
-            "LongHairCurly",
-            "LongHairCurvy",
-            "LongHairDreads",
-            "LongHairFrida",
-            "LongHairFro",
-            "LongHairFroBand",
-            "LongHairMiaWallace",
-            "LongHairNotTooLong",
-            "LongHairShavedSides",
-            "LongHairStraight",
-            "LongHairStraight2",
-            "LongHairStraightStrand",
-            "ShortHairDreads01",
-            "ShortHairDreads02",
-            "ShortHairFrizzle",
-            "ShortHairShaggyMullet",
-            "ShortHairShortCurly",
-            "ShortHairShortFlat",
-            "ShortHairShortRound",
-            "ShortHairShortWaved",
-            "ShortHairSides",
-            "ShortHairTheCaesar",
-            "ShortHairTheCaesarSidePart"
+            "NoHair","Eyepatch","Hat","Hijab","Turban",
+            "LongHairBigHair","LongHairBob","LongHairBun","LongHairCurly","LongHairCurvy","LongHairDreads",
+            "LongHairFrida","LongHairFro","LongHairFroBand","LongHairMiaWallace","LongHairNotTooLong",
+            "LongHairShavedSides","LongHairStraight","LongHairStraight2","LongHairStraightStrand",
+            "ShortHairDreads01","ShortHairDreads02","ShortHairFrizzle","ShortHairShaggyMullet",
+            "ShortHairShortCurly","ShortHairShortFlat","ShortHairShortRound","ShortHairShortWaved",
+            "ShortHairSides","ShortHairTheCaesar","ShortHairTheCaesarSidePart"
     };
 
     private static final String[] ACCESSORIES = {
-            "Blank",
-            "Kurt",
-            "Prescription01",
-            "Prescription02",
-            "Round",
-            "Sunglasses",
-            "Wayfarers"
+            "Blank","Kurt","Prescription01","Prescription02","Round","Sunglasses","Wayfarers"
     };
 
     private static final String[] FACIAL_HAIR = {
-            "Blank",
-            "BeardLight",
-            "BeardMajestic",
-            "BeardMedium",
-            "MoustacheFancy",
-            "MoustacheMagnum"
+            "Blank","BeardLight","BeardMajestic","BeardMedium","MoustacheFancy","MoustacheMagnum"
     };
 
     private static final String[] CLOTHES = {
-            "BlazerShirt",
-            "BlazerSweater",
-            "CollarSweater",
-            "GraphicShirt",
-            "Hoodie",
-            "Overall",
-            "ShirtCrewNeck",
-            "ShirtScoopNeck",
-            "ShirtVNeck"
+            "BlazerShirt","BlazerSweater","CollarSweater","GraphicShirt","Hoodie","Overall",
+            "ShirtCrewNeck","ShirtScoopNeck","ShirtVNeck"
     };
 
     private static final String[] GRAPHICS = {
@@ -107,7 +74,7 @@ public class AvatarEditorFragment extends Fragment {
     };
 
     private static final String[] FACIAL_HAIR_COLORS = {
-            "Auburn","Black","Blonde","BlondeGolden","Brown","BrownDark","PastelPink","Platinum","Red","SilverGray"
+            "Auburn","Black","Blonde","BlondeGolden","Brown","BrownDark","Platinum","Red"
     };
 
     private static final String[] CLOTHES_COLORS = {
@@ -119,14 +86,18 @@ public class AvatarEditorFragment extends Fragment {
             "Tanned","Yellow","Pale","Light","Brown","DarkBrown","Black"
     };
 
-    private int iTop=0, iAcc=0, iEyes=0, iBrows=0, iMouth=0, iFacial=0, iClothing=0, iGraphic=0;
-    private int iHairColor=0, iClothesColor=0, iFacialHairColor=0, iSkinColor=0;
-
     private AvatarConfig cfg = new AvatarConfig();
     private ImageView ivPreview;
 
     private TabLayout tabs;
     private View groupHair, groupClothes, groupAccessories, groupFace;
+
+    private Map<String, Boolean> unlocks = new HashMap<>();
+    private ListenerRegistration unlocksReg;
+
+    private MaterialAutoCompleteTextView ddTopType, ddAccessoriesType, ddClotheType, ddClotheColor,
+            ddGraphicType, ddHairColor, ddFacialHairType, ddFacialHairColor, ddEyeType, ddEyebrowType,
+            ddMouthType, ddSkinColor;
 
     @Nullable @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -163,130 +134,37 @@ public class AvatarEditorFragment extends Fragment {
         groupAccessories = root.findViewById(R.id.groupAccessories);
         groupFace        = root.findViewById(R.id.groupFace);
 
-        MaterialButton btnNextTopType        = root.findViewById(R.id.btnNextTopType);
-        MaterialButton btnHairColor          = root.findViewById(R.id.btnHairColor);
+        MaterialButton btnAvatarStyle = root.findViewById(R.id.btnAvatarStyle);
+        MaterialButton btnSave        = root.findViewById(R.id.btnSave);
 
-        MaterialButton btnNextAccessoriesType = root.findViewById(R.id.btnNextAccessoriesType);
+        if (btnAvatarStyle != null) {
+            btnAvatarStyle.setOnClickListener(v -> {
+                cfg.background = !cfg.background;
+                refresh();
+            });
+        }
+        if (btnSave != null) {
+            btnSave.setOnClickListener(v -> {
+                Log.d(TAG, "SAVE avatarConfig: " + cfg.toMap());
+                saveAvatarToFirestore(cfg);
+            });
+        }
 
-        MaterialButton btnNextClotheType     = root.findViewById(R.id.btnNextClotheType);
-        MaterialButton btnClotheColor        = root.findViewById(R.id.btnClotheColor);
-        MaterialButton btnNextGraphicType    = root.findViewById(R.id.btnNextGraphicType);
+        ddTopType         = root.findViewById(R.id.ddTopType);
+        ddAccessoriesType = root.findViewById(R.id.ddAccessoriesType);
+        ddClotheType      = root.findViewById(R.id.ddClotheType);
+        ddClotheColor     = root.findViewById(R.id.ddClotheColor);
+        ddGraphicType     = root.findViewById(R.id.ddGraphicType);
+        ddHairColor       = root.findViewById(R.id.ddHairColor);
+        ddFacialHairType  = root.findViewById(R.id.ddFacialHairType);
+        ddFacialHairColor = root.findViewById(R.id.ddFacialHairColor);
+        ddEyeType         = root.findViewById(R.id.ddEyeType);
+        ddEyebrowType     = root.findViewById(R.id.ddEyebrowType);
+        ddMouthType       = root.findViewById(R.id.ddMouthType);
+        ddSkinColor       = root.findViewById(R.id.ddSkinColor);
 
-        MaterialButton btnNextEyeType        = root.findViewById(R.id.btnNextEyeType);
-        MaterialButton btnNextEyebrowType    = root.findViewById(R.id.btnNextEyebrowType);
-        MaterialButton btnNextMouthType      = root.findViewById(R.id.btnNextMouthType);
-        MaterialButton btnNextFacialHairType = root.findViewById(R.id.btnNextFacialHairType);
-        MaterialButton btnFacialHairColor    = root.findViewById(R.id.btnFacialHairColor);
-
-        MaterialButton btnAvatarStyle        = root.findViewById(R.id.btnAvatarStyle);
-        MaterialButton btnSkinColor          = root.findViewById(R.id.btnSkinColor);
-        MaterialButton btnSave               = root.findViewById(R.id.btnSave);
-
-        updateColorButtonStates(btnHairColor, btnFacialHairColor, btnClotheColor, btnSkinColor);
-
-        if (btnNextTopType != null) btnNextTopType.setOnClickListener(v -> {
-            iTop = (iTop + 1) % TOPS.length;
-            cfg.top = TOPS[iTop];
-            applyHairHatExclusivity();
-            refresh();
-            updateColorButtonStates(btnHairColor, btnFacialHairColor, btnClotheColor, btnSkinColor);
-        });
-
-        if (btnHairColor != null) btnHairColor.setOnClickListener(v -> {
-            if (!isHairTop(cfg.top) || "NoHair".equals(cfg.top)) return;
-            iHairColor = (iHairColor + 1) % HAIR_COLORS.length;
-            cfg.hairColor = HAIR_COLORS[iHairColor];
-            refresh();
-        });
-
-        if (btnNextAccessoriesType != null) btnNextAccessoriesType.setOnClickListener(v -> {
-            iAcc = (iAcc + 1) % ACCESSORIES.length;
-            cfg.accessories = ACCESSORIES[iAcc];
-            cfg.accessoriesOn = !"Blank".equals(cfg.accessories);
-            refresh();
-        });
-
-        if (btnNextClotheType != null) btnNextClotheType.setOnClickListener(v -> {
-            iClothing = (iClothing + 1) % CLOTHES.length;
-            cfg.clothing = CLOTHES[iClothing];
-
-            if (!"GraphicShirt".equals(cfg.clothing)) {
-                cfg.clothingGraphic = null;
-            } else if (cfg.clothingGraphic == null) {
-                cfg.clothingGraphic = "Bat";
-            }
-            if (isBlazer(cfg.clothing)) {
-                cfg.clothesColor = null;
-            } else if (cfg.clothesColor == null) {
-                iClothesColor = 0;
-                cfg.clothesColor = CLOTHES_COLORS[iClothesColor];
-            }
-            refresh();
-            updateColorButtonStates(btnHairColor, btnFacialHairColor, btnClotheColor, btnSkinColor);
-        });
-
-        if (btnClotheColor != null) btnClotheColor.setOnClickListener(v -> {
-            if (isBlazer(cfg.clothing)) return;
-            iClothesColor = (iClothesColor + 1) % CLOTHES_COLORS.length;
-            cfg.clothesColor = CLOTHES_COLORS[iClothesColor];
-            refresh();
-        });
-
-        if (btnNextGraphicType != null) btnNextGraphicType.setOnClickListener(v -> {
-            if (!"GraphicShirt".equals(cfg.clothing)) return;
-            iGraphic = (iGraphic + 1) % GRAPHICS.length;
-            cfg.clothingGraphic = GRAPHICS[iGraphic];
-            refresh();
-        });
-
-        if (btnNextEyeType != null) btnNextEyeType.setOnClickListener(v -> {
-            iEyes = (iEyes + 1) % EYES.length;
-            cfg.eyes = EYES[iEyes];
-            refresh();
-        });
-
-        if (btnNextEyebrowType != null) btnNextEyebrowType.setOnClickListener(v -> {
-            iBrows = (iBrows + 1) % EYEBROWS.length;
-            cfg.eyebrows = EYEBROWS[iBrows];
-            refresh();
-        });
-
-        if (btnNextMouthType != null) btnNextMouthType.setOnClickListener(v -> {
-            iMouth = (iMouth + 1) % MOUTHS.length;
-            cfg.mouth = MOUTHS[iMouth];
-            refresh();
-        });
-
-        if (btnNextFacialHairType != null) btnNextFacialHairType.setOnClickListener(v -> {
-            iFacial = (iFacial + 1) % FACIAL_HAIR.length;
-            cfg.facialHair = FACIAL_HAIR[iFacial];
-            cfg.facialHairOn = !"Blank".equals(cfg.facialHair);
-            refresh();
-            updateColorButtonStates(btnHairColor, btnFacialHairColor, btnClotheColor, btnSkinColor);
-        });
-
-        if (btnFacialHairColor != null) btnFacialHairColor.setOnClickListener(v -> {
-            if (!cfg.facialHairOn || "Blank".equals(cfg.facialHair)) return;
-            iFacialHairColor = (iFacialHairColor + 1) % FACIAL_HAIR_COLORS.length;
-            cfg.facialHairColor = FACIAL_HAIR_COLORS[iFacialHairColor];
-            refresh();
-        });
-
-        if (btnAvatarStyle != null) btnAvatarStyle.setOnClickListener(v -> {
-            cfg.background = !cfg.background;
-            refresh();
-        });
-
-        if (btnSkinColor != null) btnSkinColor.setOnClickListener(v -> {
-            iSkinColor = (iSkinColor + 1) % SKINS.length;
-            cfg.skinColor = SKINS[iSkinColor];
-            refresh();
-        });
-
-        if (btnSave != null) btnSave.setOnClickListener(v -> {
-            Log.d(TAG, "SAVE avatarConfig: " + cfg.toMap());
-            saveAvatarToFirestore(cfg);
-        });
+        startUnlocksListener();
+        buildAllDropdowns();
 
         loadAvatarFromFirestore();
         if (tabs != null) tabs.selectTab(tabs.getTabAt(0));
@@ -326,33 +204,34 @@ public class AvatarEditorFragment extends Fragment {
         if (loaded == null) loaded = new AvatarConfig();
         cfg = loaded;
         applyHairHatExclusivity();
-        syncIndicesFromCfg();
+        buildAllDropdowns();
         refresh();
     }
 
     private void saveAvatarToFirestore(AvatarConfig raw) {
         AvatarConfig clean = new AvatarConfig();
-        clean.seed             = safe(raw.seed, "tasktimer");
 
-        clean.top              = raw.top;
-        clean.accessories      = raw.accessories;
-        clean.clothing         = raw.clothing;
-        clean.eyes             = raw.eyes;
-        clean.eyebrows         = raw.eyebrows;
-        clean.mouth            = raw.mouth;
-        clean.facialHair       = raw.facialHair;
+        clean.seed            = safe(raw.seed, "tasktimer");
 
-        clean.hairColor        = raw.hairColor;
-        clean.facialHairColor  = raw.facialHairColor;
-        clean.clothesColor     = isBlazer(raw.clothing) ? null : raw.clothesColor; // no color for blazers
-        clean.skinColor        = raw.skinColor;
+        clean.top             = raw.top;
+        clean.accessories     = raw.accessories;
+        clean.clothing        = raw.clothing;
+        clean.eyes            = raw.eyes;
+        clean.eyebrows        = raw.eyebrows;
+        clean.mouth           = raw.mouth;
+        clean.facialHair      = raw.facialHair;
 
-        clean.clothingGraphic  = "GraphicShirt".equals(raw.clothing) ? raw.clothingGraphic : null;
+        clean.hairColor       = raw.hairColor;
+        clean.facialHairColor = raw.facialHairColor;
+        clean.clothesColor    = isBlazer(raw.clothing) ? null : raw.clothesColor;
+        clean.skinColor       = raw.skinColor;
 
-        clean.background       = raw.background;
+        clean.clothingGraphic = "GraphicShirt".equals(raw.clothing) ? raw.clothingGraphic : null;
 
-        clean.accessoriesOn    = !"Blank".equals(raw.accessories);
-        clean.facialHairOn     = raw.facialHairOn && !"Blank".equals(raw.facialHair);
+        clean.background      = raw.background;
+
+        clean.accessoriesOn   = !"Blank".equals(raw.accessories);
+        clean.facialHairOn    = raw.facialHairOn && !"Blank".equals(raw.facialHair);
 
         applyHairHatExclusivityFor(clean);
 
@@ -368,9 +247,9 @@ public class AvatarEditorFragment extends Fragment {
                 .addOnFailureListener(e -> Log.e(TAG, "Failed to save avatarConfig", e));
     }
 
-
     private void refresh() {
         sanitizeForAvataaars(cfg);
+        updateDropdownEnables();
         if (ivPreview != null) {
             AvatarSvgLoader.load(ivPreview, cfg, "EDITOR");
         }
@@ -391,9 +270,7 @@ public class AvatarEditorFragment extends Fragment {
     }
 
     private void applyHairHatExclusivity() {
-        if (isHatTop(cfg.top) || isHeadCover(cfg.top)) {
-            cfg.hairColor = null;
-        } else if ("NoHair".equals(cfg.top)) {
+        if (isHatTop(cfg.top) || isHeadCover(cfg.top) || "NoHair".equals(cfg.top)) {
             cfg.hairColor = null;
         }
     }
@@ -427,53 +304,236 @@ public class AvatarEditorFragment extends Fragment {
         v.setAlpha(enabled ? 1f : 0.35f);
     }
 
-    private void updateColorButtonStates(
-            MaterialButton btnHairColor,
-            MaterialButton btnFacialHairColor,
-            MaterialButton btnClothesColor,
-            MaterialButton btnSkinColor
-    ) {
-        if (btnHairColor != null)       btnHairColor.setVisibility(View.VISIBLE);
-        if (btnFacialHairColor != null) btnFacialHairColor.setVisibility(View.VISIBLE);
-        if (btnClothesColor != null)    btnClothesColor.setVisibility(View.VISIBLE);
-        if (btnSkinColor != null)       btnSkinColor.setVisibility(View.VISIBLE);
+    @Override public void onDestroyView() {
+        super.onDestroyView();
+        if (unlocksReg != null) { unlocksReg.remove(); unlocksReg = null; }
+    }
 
-        final boolean hairColorAllowed       = isHairTop(cfg.top);
+    private void startUnlocksListener() {
+        String uid = (FirebaseAuth.getInstance().getCurrentUser() != null)
+                ? FirebaseAuth.getInstance().getCurrentUser().getUid() : null;
+        if (uid == null) return;
+
+        DocumentReference userRef = FirebaseFirestore.getInstance()
+                .collection("users").document(uid);
+
+        unlocksReg = userRef.addSnapshotListener((snap, e) -> {
+            if (e != null || snap == null) return;
+            Object u = snap.get("unlocks");
+            if (u instanceof Map) {
+                unlocks = (Map<String, Boolean>) u;
+            } else unlocks = new HashMap<>();
+            buildAllDropdowns();
+        });
+    }
+
+    private void buildAllDropdowns() {
+        makeReadOnly(ddTopType);
+        makeReadOnly(ddAccessoriesType);
+        makeReadOnly(ddClotheType);
+        makeReadOnly(ddClotheColor);
+        makeReadOnly(ddGraphicType);
+        makeReadOnly(ddHairColor);
+        makeReadOnly(ddFacialHairType);
+        makeReadOnly(ddFacialHairColor);
+        makeReadOnly(ddEyeType);
+        makeReadOnly(ddEyebrowType);
+        makeReadOnly(ddMouthType);
+        makeReadOnly(ddSkinColor);
+
+        setDropdown(ddTopType, TOPS,
+                (map, slug) -> Unlocks.hairUnlocked(map, slug) || isHatTop(slug) || "NoHair".equals(slug),
+                picked -> {
+                    cfg.top = picked;
+                    applyHairHatExclusivity();
+                    refresh();
+                });
+
+        setDropdown(ddAccessoriesType, ACCESSORIES,
+                Unlocks::glassesUnlocked,
+                picked -> {
+                    cfg.accessories  = picked;
+                    cfg.accessoriesOn = !"Blank".equals(picked);
+                    refresh();
+                });
+
+        setDropdown(ddClotheType, CLOTHES,
+                Unlocks::clothesUnlocked,
+                picked -> {
+                    cfg.clothing = picked;
+                    if (!"GraphicShirt".equals(picked)) cfg.clothingGraphic = null;
+                    if (isBlazer(picked)) cfg.clothesColor = null;
+                    refresh();
+                });
+
+        setDropdown(ddGraphicType, GRAPHICS,
+                Unlocks::graphicUnlocked,
+                picked -> {
+                    cfg.clothingGraphic = picked;
+                    refresh();
+                });
+
+        setDropdown(ddHairColor, HAIR_COLORS,
+                Unlocks::hairColorUnlocked,
+                picked -> {
+                    cfg.hairColor = picked;
+                    refresh();
+                });
+
+        setDropdown(ddFacialHairColor, FACIAL_HAIR_COLORS,
+                Unlocks::facialHairColorUnlocked,
+                picked -> {
+                    cfg.facialHairColor = picked;
+                    refresh();
+                });
+
+        setDropdown(ddClotheColor, CLOTHES_COLORS,
+                Unlocks::clothesColorUnlocked,
+                picked -> {
+                    cfg.clothesColor = picked;
+                    refresh();
+                });
+
+        setDropdown(ddSkinColor, SKINS,
+                Unlocks::skinUnlocked,
+                picked -> {
+                    cfg.skinColor = picked;
+                    refresh();
+                });
+
+        setDropdown(ddEyeType, EYES,
+                Unlocks::eyesUnlocked,
+                picked -> { cfg.eyes = picked; });
+
+        simpleDropdown(ddEyebrowType, EYEBROWS, sel -> { cfg.eyebrows = sel; });
+
+        setDropdown(ddMouthType, MOUTHS,
+                Unlocks::mouthUnlocked,
+                picked -> { cfg.mouth = picked; });
+
+        setDropdown(ddFacialHairType, FACIAL_HAIR,
+                (map, slug) -> "Blank".equals(slug) || Unlocks.facialHairUnlocked(map, slug),
+                picked -> {
+                    cfg.facialHair   = picked;
+                    cfg.facialHairOn = !"Blank".equals(picked);
+                });
+
+        selectIn(ddTopType, cfg.top);
+        selectIn(ddAccessoriesType, cfg.accessories == null ? "Blank" : cfg.accessories);
+        selectIn(ddClotheType, cfg.clothing);
+        selectIn(ddGraphicType, cfg.clothingGraphic);
+        selectIn(ddHairColor, cfg.hairColor);
+        selectIn(ddFacialHairColor, cfg.facialHairColor);
+        selectIn(ddClotheColor, cfg.clothesColor);
+        selectIn(ddSkinColor, cfg.skinColor);
+        selectIn(ddEyeType, cfg.eyes);
+        selectIn(ddEyebrowType, cfg.eyebrows);
+        selectIn(ddMouthType, cfg.mouth);
+
+        updateDropdownEnables();
+    }
+
+
+    private void updateDropdownEnables() {
+        final boolean hairColorAllowed = isHairTop(cfg.top);
         final boolean facialHairColorAllowed = cfg.facialHairOn && cfg.facialHair != null && !"Blank".equals(cfg.facialHair);
-        final boolean clothesColorAllowed    = !isBlazer(cfg.clothing);
-        final boolean skinColorAllowed       = true;
+        final boolean clothesColorAllowed = !isBlazer(cfg.clothing);
+        final boolean graphicAllowed = "GraphicShirt".equals(cfg.clothing);
 
-        setEnabledWithAlpha(btnHairColor,       hairColorAllowed);
-        setEnabledWithAlpha(btnFacialHairColor, facialHairColorAllowed);
-        setEnabledWithAlpha(btnClothesColor,    clothesColorAllowed);
-        setEnabledWithAlpha(btnSkinColor,       skinColorAllowed);
+        setEnabledWithAlpha(ddHairColor, hairColorAllowed);
+        if (!hairColorAllowed) cfg.hairColor = null;
 
-        if (!hairColorAllowed)       cfg.hairColor       = null;
+        setEnabledWithAlpha(ddFacialHairColor, facialHairColorAllowed);
         if (!facialHairColorAllowed) cfg.facialHairColor = null;
-        if (!clothesColorAllowed)    cfg.clothesColor    = null;
+
+        setEnabledWithAlpha(ddClotheColor, clothesColorAllowed);
+        if (!clothesColorAllowed) cfg.clothesColor = null;
+
+        setEnabledWithAlpha(ddGraphicType, graphicAllowed);
+        if (!graphicAllowed) cfg.clothingGraphic = null;
     }
 
-    private void syncIndicesFromCfg() {
-        iTop       = idxOf(TOPS,         cfg.top, 0);
-        iAcc       = idxOf(ACCESSORIES,  cfg.accessories == null ? "Blank" : cfg.accessories, 0);
-        iEyes      = idxOf(EYES,         cfg.eyes, 0);
-        iBrows     = idxOf(EYEBROWS,     cfg.eyebrows, 0);
-        iMouth     = idxOf(MOUTHS,       cfg.mouth, 0);
-        iFacial    = idxOf(FACIAL_HAIR,  cfg.facialHairOn ? cfg.facialHair : "Blank", 0);
-        iClothing  = idxOf(CLOTHES,      cfg.clothing, 0);
-        iGraphic   = idxOf(GRAPHICS,     cfg.clothingGraphic == null ? "Bat" : cfg.clothingGraphic, 0);
+    private void setDropdown(@Nullable MaterialAutoCompleteTextView dd,
+                             @NonNull String[] values,
+                             @NonNull UnlockCheck checker,
+                             @NonNull OnPick<String> onPick) {
+        if (dd == null) return;
 
-        iHairColor        = idxOf(HAIR_COLORS,        cfg.hairColor, 0);
-        iFacialHairColor  = idxOf(FACIAL_HAIR_COLORS, cfg.facialHairColor, 0);
-        iClothesColor     = idxOf(CLOTHES_COLORS,     cfg.clothesColor, 0);
-        iSkinColor        = idxOf(SKINS,              cfg.skinColor, 0);
+        List<String> display = new ArrayList<>(values.length);
+        for (String v : values) {
+            boolean ok = checker.isUnlocked(unlocks, v);
+            display.add(ok ? v : (v + "  🔒"));
+        }
+
+        ArrayAdapter<String> ad = new ArrayAdapter<>(requireContext(),
+                android.R.layout.simple_list_item_1, display);
+        dd.setAdapter(ad);
+
+        dd.setOnItemClickListener((parent, view, position, id) -> {
+            String picked = values[position];
+            boolean ok = checker.isUnlocked(unlocks, picked);
+            if (!ok) {
+                Toast.makeText(requireContext(), "Locked — buy in Shop", Toast.LENGTH_SHORT).show();
+                selectIn(dd, currentFor(dd));
+                return;
+            }
+            onPick.accept(picked);
+            refresh();
+        });
     }
 
-    private static int idxOf(String[] arr, String v, int dflt) {
-        if (v == null) return dflt;
-        for (int i = 0; i < arr.length; i++) if (v.equals(arr[i])) return i;
-        return dflt;
+    private interface UnlockCheck {
+        boolean isUnlocked(Map<String, Boolean> unlocks, String slug);
     }
 
-    private static String safe(String s, String d) { return (s==null||s.isEmpty()) ? d : s; }
+    private interface OnPick<T> {
+        void accept(T value);
+    }
+
+    private void simpleDropdown(@Nullable MaterialAutoCompleteTextView dd,
+                                @NonNull String[] values,
+                                @NonNull java.util.function.Consumer<String> apply) {
+        if (dd == null) return;
+        ArrayAdapter<String> ad = new ArrayAdapter<>(requireContext(), android.R.layout.simple_list_item_1, values);
+        dd.setAdapter(ad);
+        dd.setOnItemClickListener((p, v, pos, id) -> {
+            apply.accept(values[pos]);
+            refresh();
+        });
+    }
+
+    private void selectIn(@Nullable MaterialAutoCompleteTextView dd, @Nullable String value) {
+        if (dd == null || value == null) return;
+        dd.setText(value, false);
+    }
+
+    private void makeReadOnly(@Nullable com.google.android.material.textfield.MaterialAutoCompleteTextView dd) {
+        if (dd == null) return;
+        dd.setInputType(android.text.InputType.TYPE_NULL);
+        dd.setKeyListener(null);
+        dd.setCursorVisible(false);
+        dd.setFocusable(false);
+        dd.setClickable(true);
+        dd.setOnClickListener(v -> dd.showDropDown());
+        dd.setOnFocusChangeListener((v, has) -> { if (has) dd.showDropDown(); });
+    }
+
+
+
+    @Nullable private String currentFor(@NonNull MaterialAutoCompleteTextView dd) {
+        if (dd == ddTopType) return cfg.top;
+        if (dd == ddAccessoriesType) return cfg.accessories;
+        if (dd == ddClotheType) return cfg.clothing;
+        if (dd == ddGraphicType) return cfg.clothingGraphic;
+        if (dd == ddHairColor) return cfg.hairColor;
+        if (dd == ddFacialHairColor) return cfg.facialHairColor;
+        if (dd == ddClotheColor) return cfg.clothesColor;
+        if (dd == ddSkinColor) return cfg.skinColor;
+        if (dd == ddEyeType) return cfg.eyes;
+        if (dd == ddEyebrowType) return cfg.eyebrows;
+        if (dd == ddMouthType) return cfg.mouth;
+        return null;
+    }
+
+    private static String safe(String s, String d) { return (s == null || s.isEmpty()) ? d : s; }
 }

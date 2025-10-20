@@ -21,4 +21,7 @@
     <string name="sat">Sat</string>
     <string name="habits">Habits</string>
     <string name="no_habits_yet_ntap_to_create_your_first_one">No habits yet.\nTap + to create your first one.</string>
+    <string name="working_on">Working on: %1$s</string>
+    <string name="complete">Complete</string>
+    <string name="cancel">Cancel</string>
 </resources>

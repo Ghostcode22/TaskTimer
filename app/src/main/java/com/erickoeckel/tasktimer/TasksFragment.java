@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.speech.RecognizerIntent;
-import android.text.TextUtils;
 import android.view.*;
 import android.widget.ImageButton;
 import android.widget.TextView;
@@ -22,6 +21,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import androidx.navigation.fragment.NavHostFragment;
+
 
 public class TasksFragment extends Fragment {
 
@@ -46,16 +47,15 @@ public class TasksFragment extends Fragment {
 
             String taskTitle = "Task";
             Task tapped = adapter.findById(id);
-            if (tapped != null && !TextUtils.isEmpty(tapped.getTitle())) {
+            if (tapped != null && !android.text.TextUtils.isEmpty(tapped.getTitle())) {
                 taskTitle = tapped.getTitle();
             }
 
             vm.completeTask(id);
 
-            Map<String, Object> extra = new HashMap<>();
+            java.util.Map<String, Object> extra = new java.util.HashMap<>();
             extra.put("taskTitle", taskTitle);
             extra.put("tasksLeft", remainingAfter);
-
             AiCoach.generateAndNotify(
                     requireContext(),
                     AiCoach.EVENT_TASK_COMPLETED,
@@ -63,7 +63,16 @@ public class TasksFragment extends Fragment {
                     Notify.CH_REWARDS,
                     "Task completed!"
             );
+        }, task -> {
+            Bundle args = new Bundle();
+            args.putString("sourceType", "task");
+            args.putString("sourceId", task.getId());
+            args.putString("sourceTitle", task.getTitle());
+            args.putBoolean("autoStart", true);
+            NavHostFragment.findNavController(TasksFragment.this)
+                    .navigate(R.id.timerFragment, args);
         });
+
         rv.setAdapter(adapter);
 
         fabAddTask = v.findViewById(R.id.fabAddTask);

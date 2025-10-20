@@ -4,9 +4,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.RecyclerView;
 import java.util.ArrayList;
 import java.util.List;
@@ -16,13 +16,22 @@ public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.VH> {
     public interface Toggle {
         void onToggle(@NonNull String taskId, boolean checked);
     }
+    public interface Opener {
+        void onOpen(@NonNull Task task);
+    }
 
     private final Toggle toggle;
+    @Nullable private final Opener opener;
     private final List<Task> data = new ArrayList<>();
+    boolean isDone;
 
-    public TasksAdapter(@NonNull Toggle toggle) {
+    public TasksAdapter(@NonNull Toggle toggle) { this(toggle, null); }
+
+    public TasksAdapter(@NonNull Toggle toggle, @Nullable Opener opener) {
         this.toggle = toggle;
+        this.opener = opener;
     }
+
 
     public static class VH extends RecyclerView.ViewHolder {
         CheckBox cb;
@@ -43,22 +52,29 @@ public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.VH> {
     @Override
     public void onBindViewHolder(@NonNull VH h, int pos) {
         Task t = data.get(pos);
-
-        h.cb.setOnCheckedChangeListener(null);
+        isDone = t.isDone();
         h.title.setText(t.getTitle());
-        h.cb.setChecked(t.isDone());
+        h.cb.setOnCheckedChangeListener(null);
+        h.cb.setChecked(isDone);
+        h.cb.setEnabled(false);
+        h.cb.setAlpha(1f);
 
-        boolean canToggle = !t.isDone();
-        h.cb.setEnabled(canToggle);
-        h.cb.setAlpha(canToggle ? 1f : 0.4f);
-
-        h.cb.setOnCheckedChangeListener((CompoundButton b, boolean checked) -> {
-            if (canToggle && checked && toggle != null) {
-                toggle.onToggle(t.getId(), true);
+        if (opener != null) {
+            if (!isDone) {
+                h.itemView.setOnClickListener(v -> opener.onOpen(t));
+                h.itemView.setClickable(true);
+                h.itemView.setEnabled(true);
+                h.title.setAlpha(1f);
+            } else {
+                h.itemView.setOnClickListener(null);
+                h.itemView.setClickable(false);
+                h.itemView.setEnabled(false);
+                h.title.setAlpha(0.5f);
             }
-        });
+        }
+
         TextView tvDue = h.itemView.findViewById(R.id.tvDue);
-        String ymd = t.getDueDate(); // must be "yyyy-MM-dd"
+        String ymd = t.getDueDate();
         if (ymd == null || ymd.trim().isEmpty()) {
             tvDue.setVisibility(View.GONE);
         } else {
@@ -102,7 +118,7 @@ public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.VH> {
     }
 
     public int countUndone() {
-        int n = 0; for (Task t : data) if (!t.isDone()) n++; return n;
+        int n = 0; for (Task t : data) if (!isDone) n++; return n;
     }
 
     public Task findById(@NonNull String id) {

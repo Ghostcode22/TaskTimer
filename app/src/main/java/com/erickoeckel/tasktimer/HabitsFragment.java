@@ -11,6 +11,8 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.navigation.fragment.NavHostFragment;
+
 
 public class HabitsFragment extends Fragment {
 
@@ -43,7 +45,17 @@ public class HabitsFragment extends Fragment {
                                 "Habit logged!"
                         );
                     });
+        }, habit -> {
+            Bundle args = new Bundle();
+            args.putString("sourceType", "habit");
+            args.putString("sourceId", habit.getId());
+            args.putString("sourceTitle", habit.getTitle());
+            args.putBoolean("autoStart", true);
+            NavHostFragment.findNavController(HabitsFragment.this)
+                    .navigate(R.id.timerFragment, args);
         });
+
+
 
         rv.setAdapter(adapter);
 

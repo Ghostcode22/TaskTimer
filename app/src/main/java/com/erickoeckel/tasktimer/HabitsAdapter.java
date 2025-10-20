@@ -10,9 +10,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 import com.google.firebase.auth.FirebaseAuth;
@@ -24,13 +24,20 @@ import java.util.*;
 public class HabitsAdapter extends RecyclerView.Adapter<HabitsAdapter.VH> {
 
     public interface Toggle { void onToggle(String id, boolean checked); }
+    public interface Opener { void onOpen(@NonNull Habit habit); }
 
     private final List<Habit> data = new ArrayList<>();
     private final Toggle toggle;
+    @Nullable private final Opener opener;
 
     private final Map<String, Set<String>> weekCache = new HashMap<>();
 
-    public HabitsAdapter(Toggle toggle) { this.toggle = toggle; }
+    public HabitsAdapter(Toggle toggle) { this(toggle, null); }
+
+    public HabitsAdapter(Toggle toggle, @Nullable Opener opener) {
+        this.toggle = toggle;
+        this.opener = opener;
+    }
 
     public void submit(List<Habit> list) {
         data.clear();
@@ -62,25 +69,31 @@ public class HabitsAdapter extends RecyclerView.Adapter<HabitsAdapter.VH> {
     public void onBindViewHolder(@NonNull VH h, int pos) {
         Habit hb = data.get(pos);
         h.boundHabitId = hb.getId();
-
         h.title.setText(hb.getTitle());
         h.streak.setText("🔥 " + hb.getStreak());
 
         String todayStr = today();
         boolean isTodayChecked = todayStr.equals(hb.getLastCompleted());
-        boolean activeToday    = Habit.isActiveToday(hb.getDays());
-        boolean canToggleToday = activeToday && !isTodayChecked;
+
+        if (opener != null) {
+            if (!isTodayChecked) {
+                h.itemView.setOnClickListener(v -> opener.onOpen(hb));
+                h.itemView.setClickable(true);
+                h.itemView.setEnabled(true);
+                h.title.setAlpha(1f);
+            } else {
+                h.itemView.setOnClickListener(null);
+                h.itemView.setClickable(false);
+                h.itemView.setEnabled(false);
+                h.title.setAlpha(0.5f);
+            }
+        }
 
         h.today.setOnCheckedChangeListener(null);
         h.today.setChecked(isTodayChecked);
-        h.today.setEnabled(canToggleToday);
-        h.today.setAlpha(canToggleToday ? 1f : 0.4f);
 
-        h.today.setOnCheckedChangeListener((CompoundButton b, boolean checked) -> {
-            if (canToggleToday && checked && toggle != null) {
-                toggle.onToggle(hb.getId(), true);
-            }
-        });
+        h.today.setEnabled(false);
+        h.today.setAlpha(1f);
 
         renderDays(h.days, hb.getDays(), hb.getLastCompleted(), null);
 

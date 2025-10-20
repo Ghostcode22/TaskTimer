@@ -3,24 +3,50 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
-    app:startDestination="@id/timerFragment">
+    app:startDestination="@id/profileFragment">
 
     <fragment
         android:id="@+id/timerFragment"
         android:name="com.erickoeckel.tasktimer.TimerFragment"
         android:label="@string/title_timer"
-        app:defaultNavHost="false" />
+        app:defaultNavHost="false">
+
+    <argument
+        android:name="sourceType"
+        app:argType="string"
+        android:defaultValue="" />
+    <argument
+        android:name="sourceId"
+        app:argType="string"
+        android:defaultValue="" />
+    <argument
+        android:name="sourceTitle"
+        app:argType="string"
+        android:defaultValue="" />
+    <argument
+        android:name="autostart"
+        app:argType="boolean"
+        android:defaultValue="false" />
+    </fragment>
 
     <fragment
         android:id="@+id/tasksFragment"
         android:name="com.erickoeckel.tasktimer.TasksFragment"
-        android:label="@string/title_task" />
+        android:label="@string/title_task">
+    <action
+        android:id="@+id/action_tasksFragment_to_timerFragment"
+        app:destination="@id/timerFragment" />
+    </fragment>
 
     <fragment
         android:id="@+id/habitsFragment"
         android:name="com.erickoeckel.tasktimer.HabitsFragment"
         android:label="Habits"
-        tools:layout="@layout/fragment_habits" />
+        tools:layout="@layout/fragment_habits">
+    <action
+        android:id="@+id/action_habitsFragment_to_timerFragment"
+        app:destination="@id/timerFragment" />
+    </fragment>
 
     <fragment
         android:id="@+id/profileFragment"

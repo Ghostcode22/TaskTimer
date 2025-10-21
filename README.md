@@ -53,7 +53,7 @@ TaskTimer is a gamified focus and habit‑tracking app that uses the **Pomodoro 
 ##  Setup
 1. Clone the repo:
    ```bash
-   git clone https://github.com/<your-username>/TaskTimer.git
+   git clone https://github.com/Ghostcode22/TaskTimer.git
    ```
 2. Open in **Android Studio**.
 3. Add your Firebase `google-services.json` (Auth + Firestore enabled).

@@ -25,7 +25,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 
 public class ProfileFragment extends Fragment {
 
-    private TextView tvEmail, tvWelcome, tvLevel, tvXp, tvCoins, tvAvatarSummary;
+    private TextView tvEmail, tvWelcome, tvLevel, tvXp, tvCoins;
     private ImageView ivAvatar;
     private FirebaseAuth auth;
 
@@ -40,7 +40,6 @@ public class ProfileFragment extends Fragment {
         tvLevel          = v.findViewById(R.id.tvLevel);
         tvXp             = v.findViewById(R.id.tvXp);
         tvCoins          = v.findViewById(R.id.tvCoins);
-        tvAvatarSummary  = v.findViewById(R.id.tvAvatarSummary);
         ivAvatar         = v.findViewById(R.id.ivAvatar);
         MaterialButton btnFriends         = v.findViewById(R.id.btnFriends);
         MaterialButton btnCustomizeAvatar = v.findViewById(R.id.btnCustomizeAvatar);
@@ -131,12 +130,7 @@ public class ProfileFragment extends Fragment {
         tvCoins.setText(coins + " Coins");
 
         AvatarConfig cfg = AvatarConfig.from(snap);
-        tvAvatarSummary.setText(
-                "Top: " + cfg.top + ", Eyes: " + cfg.eyes
-        );
-
         AvatarSvgLoader.load(ivAvatar, cfg, "PROFILE");
-
     }
 
     private void ensureUserDoc(FirebaseFirestore db, FirebaseUser user) {

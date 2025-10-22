@@ -64,6 +64,8 @@
         android:layout_height="wrap_content"
         android:text="No tasks yet.\nTap + to create your first one."
         android:textSize="16sp"
+        android:padding="24dp"
+        android:gravity="center"
         android:visibility="gone"
         app:layout_constraintTop_toBottomOf="@id/tvHeader"
         app:layout_constraintBottom_toBottomOf="parent"

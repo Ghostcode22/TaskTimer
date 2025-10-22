@@ -25,7 +25,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 
 public class ProfileFragment extends Fragment {
 
-    private TextView tvEmail, tvWelcome, tvLevel, tvXp, tvCoins;
+    private TextView tvWelcome, tvLevel, tvXp, tvCoins;
     private ImageView ivAvatar;
     private FirebaseAuth auth;
 
@@ -36,7 +36,6 @@ public class ProfileFragment extends Fragment {
         View v = inflater.inflate(R.layout.fragment_profile, container, false);
 
         tvWelcome        = v.findViewById(R.id.tvWelcome);
-        tvEmail          = v.findViewById(R.id.tvEmail);
         tvLevel          = v.findViewById(R.id.tvLevel);
         tvXp             = v.findViewById(R.id.tvXp);
         tvCoins          = v.findViewById(R.id.tvCoins);
@@ -63,9 +62,7 @@ public class ProfileFragment extends Fragment {
                         if ("hat".equals(cfg.top) || cfg.top.startsWith("winterHat")) {
                             cfg.hairColor = null;
                         } else if ("noHair".equals(cfg.top)) {
-                            cfg.hairColor = null; cfg.hatColor = null;
-                        } else {
-                            cfg.hatColor = null;
+                            cfg.hairColor = null;
                         }
                     }
                     AvatarSvgLoader.load(ivAvatar, cfg, "PROFILE");
@@ -74,7 +71,6 @@ public class ProfileFragment extends Fragment {
 
         if (user != null) {
             tvWelcome.setText("Welcome!");
-            tvEmail.setText(user.getEmail() == null ? "" : user.getEmail());
 
             ensureUserDoc(db, user);
 
@@ -102,7 +98,6 @@ public class ProfileFragment extends Fragment {
 
         } else {
             tvWelcome.setText("Not signed in");
-            tvEmail.setText("");
         }
 
         btnSignOut.setOnClickListener(view -> {
@@ -131,6 +126,15 @@ public class ProfileFragment extends Fragment {
 
         AvatarConfig cfg = AvatarConfig.from(snap);
         AvatarSvgLoader.load(ivAvatar, cfg, "PROFILE");
+
+        String uname = snap.getString("username");
+        if (uname == null || uname.trim().isEmpty()) {
+            FirebaseUser u = FirebaseAuth.getInstance().getCurrentUser();
+            if (u != null && u.getDisplayName() != null && !u.getDisplayName().trim().isEmpty()) {
+                uname = u.getDisplayName();
+            }
+        }
+        tvWelcome.setText(uname != null && !uname.isEmpty() ? "Welcome, " + uname + "!" : "Welcome!");
     }
 
     private void ensureUserDoc(FirebaseFirestore db, FirebaseUser user) {

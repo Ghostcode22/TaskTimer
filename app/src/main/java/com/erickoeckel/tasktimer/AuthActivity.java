@@ -17,9 +17,12 @@ import com.google.firebase.firestore.SetOptions;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import com.google.android.material.textfield.TextInputLayout;
+import com.google.firebase.auth.UserProfileChangeRequest;
 
 public class AuthActivity extends AppCompatActivity {
-    private TextInputEditText etEmail, etPassword;
+    private TextInputEditText etEmail, etPassword, etUsername;
+    private TextInputLayout tilUsername;
     private MaterialButton btnSubmit;
     private MaterialButtonToggleGroup toggle;
     private ProgressBar progress;
@@ -37,6 +40,8 @@ public class AuthActivity extends AppCompatActivity {
 
         etEmail = findViewById(R.id.etEmail);
         etPassword = findViewById(R.id.etPassword);
+        tilUsername = findViewById(R.id.tilUsername);
+        etUsername  = findViewById(R.id.etUsername);
         btnSubmit = findViewById(R.id.btnSubmit);
         toggle = findViewById(R.id.toggleMode);
         progress = findViewById(R.id.progress);
@@ -46,6 +51,9 @@ public class AuthActivity extends AppCompatActivity {
             if (!isChecked) return;
             isRegister = (checkedId == R.id.btnRegisterMode);
             btnSubmit.setText(isRegister ? "Create Account" : "Login");
+            if (tilUsername != null) {
+                tilUsername.setVisibility(isRegister ? View.VISIBLE : View.GONE);
+            }
             tvError.setVisibility(View.GONE);
         });
 
@@ -55,6 +63,16 @@ public class AuthActivity extends AppCompatActivity {
     private void submit() {
         String email = Objects.toString(etEmail.getText(), "").trim();
         String pass = Objects.toString(etPassword.getText(), "").trim();
+        String username = "";
+
+        if (isRegister && etUsername != null) {
+            username = Objects.toString(etUsername.getText(), "").trim();
+            if (username.isEmpty()) {
+                showError("Please choose a username.");
+                setLoading(false);
+                return;
+            }
+        }
 
         if (email.isEmpty() || pass.isEmpty()) {
             showError("Email and password required.");
@@ -64,6 +82,8 @@ public class AuthActivity extends AppCompatActivity {
         setLoading(true);
 
         if (isRegister) {
+            final String chosenUsername = username; // ✅ make it final for lambdas
+
             auth.createUserWithEmailAndPassword(email, pass)
                     .addOnCompleteListener(task -> {
                         if (task.isSuccessful()) {
@@ -74,9 +94,15 @@ public class AuthActivity extends AppCompatActivity {
                                 base.put("xp", 0L);
                                 base.put("coins", 0L);
                                 base.put("createdAt", FieldValue.serverTimestamp());
+                                base.put("username", chosenUsername);
+                                base.put("displayName", chosenUsername);
+                                base.put("avatarConfig", new AvatarConfig().toMap());
+
+                                user.updateProfile(new UserProfileChangeRequest.Builder()
+                                        .setDisplayName(chosenUsername)
+                                        .build());
+
                                 db.collection("users").document(user.getUid()).set(base, SetOptions.merge());
-
-
                                 db.collection("users").document(user.getUid())
                                         .set(base, SetOptions.merge())
                                         .addOnSuccessListener(unused -> goToApp())
@@ -124,6 +150,7 @@ public class AuthActivity extends AppCompatActivity {
         toggle.setEnabled(!b);
         etEmail.setEnabled(!b);
         etPassword.setEnabled(!b);
+        if (etUsername != null) etUsername.setEnabled(!b);
     }
 }
 

@@ -25,7 +25,7 @@ public class AvatarConfig {
     public String skinColor  = "Brown";
     public boolean background = false;
 
-    public String clothing = "Hoodie";
+    public String clothing = "GraphicShirt";
     public String clothesColor = "Black";
     public String clothingGraphic = "Skull";
 

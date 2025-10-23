@@ -42,7 +42,7 @@ public class ShopFragment extends Fragment {
     @Nullable @Override
     public View onCreateView(@NonNull LayoutInflater inf, @Nullable ViewGroup parent, @Nullable Bundle b) {
         View v = inf.inflate(R.layout.fragment_shop, parent, false);
-        tvCoins = v.findViewById(R.id.tvCoins);
+        tvCoins = v.findViewById(R.id.btnCoins);
         rv = v.findViewById(R.id.rvShop);
 
         vm = new ViewModelProvider(this).get(ShopViewModel.class);

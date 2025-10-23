@@ -7,23 +7,17 @@
 
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbarAvatar"
+        style="@style/Widget.TaskTimer.Toolbar.Primary"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        android:background="#0A2740"
         app:title="Customize Avatar"
-        app:titleTextColor="@android:color/white"
-        app:navigationIcon="@drawable/ic_arrow_back_24"
-        app:navigationIconTint="@android:color/white" />
+        app:navigationIcon="@drawable/ic_arrow_back_24" />
 
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/tabs"
+        style="@style/Widget.TaskTimer.TabLayout.Primary"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:tabMode="fixed"
-        app:tabIndicatorFullWidth="false"
-        app:tabTextColor="@android:color/white"
-        app:tabSelectedTextColor="@android:color/white"
-        android:background="#0A2740" />
+        android:layout_height="wrap_content" />
 
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
@@ -60,7 +54,7 @@
 
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/tilTopType"
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                    style="@style/Widget.TaskTimer.OutlinedDropdown"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
@@ -73,12 +67,15 @@
                         android:focusable="false"
                         android:clickable="true"
                         android:cursorVisible="false"
-                        android:importantForAutofill="no" />
+                        android:importantForAutofill="no"
+                        android:textColor="@color/white"
+                        android:textColorHint="@color/light_gray"
+                        />
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/tilHairColor"
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                    style="@style/Widget.TaskTimer.OutlinedDropdown"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
@@ -91,7 +88,9 @@
                         android:focusable="false"
                         android:clickable="true"
                         android:cursorVisible="false"
-                        android:importantForAutofill="no" />
+                        android:importantForAutofill="no"
+                        android:textColor="@color/white"
+                        android:textColorHint="@color/light_gray" />
                 </com.google.android.material.textfield.TextInputLayout>
 
             </LinearLayout>
@@ -111,7 +110,7 @@
 
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/tilAccessoriesType"
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                    style="@style/Widget.TaskTimer.OutlinedDropdown"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
@@ -124,7 +123,9 @@
                         android:focusable="false"
                         android:clickable="true"
                         android:cursorVisible="false"
-                        android:importantForAutofill="no" />
+                        android:importantForAutofill="no"
+                        android:textColor="@color/white"
+                        android:textColorHint="@color/light_gray" />
                 </com.google.android.material.textfield.TextInputLayout>
 
             </LinearLayout>
@@ -144,7 +145,7 @@
 
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/tilClotheType"
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                    style="@style/Widget.TaskTimer.OutlinedDropdown"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
@@ -157,12 +158,14 @@
                         android:focusable="false"
                         android:clickable="true"
                         android:cursorVisible="false"
-                        android:importantForAutofill="no" />
+                        android:importantForAutofill="no"
+                        android:textColor="@color/white"
+                        android:textColorHint="@color/light_gray" />
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/tilClotheColor"
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                    style="@style/Widget.TaskTimer.OutlinedDropdown"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
@@ -175,12 +178,14 @@
                         android:focusable="false"
                         android:clickable="true"
                         android:cursorVisible="false"
-                        android:importantForAutofill="no" />
+                        android:importantForAutofill="no"
+                        android:textColor="@color/white"
+                        android:textColorHint="@color/light_gray" />
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/tilGraphicType"
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                    style="@style/Widget.TaskTimer.OutlinedDropdown"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
@@ -193,7 +198,9 @@
                         android:focusable="false"
                         android:clickable="true"
                         android:cursorVisible="false"
-                        android:importantForAutofill="no" />
+                        android:importantForAutofill="no"
+                        android:textColor="@color/white"
+                        android:textColorHint="@color/light_gray" />
                 </com.google.android.material.textfield.TextInputLayout>
 
             </LinearLayout>
@@ -213,7 +220,7 @@
 
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/tilEyeType"
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                    style="@style/Widget.TaskTimer.OutlinedDropdown"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
@@ -226,12 +233,14 @@
                         android:focusable="false"
                         android:clickable="true"
                         android:cursorVisible="false"
-                        android:importantForAutofill="no" />
+                        android:importantForAutofill="no"
+                        android:textColor="@color/white"
+                        android:textColorHint="@color/light_gray" />
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/tilEyebrowType"
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                    style="@style/Widget.TaskTimer.OutlinedDropdown"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
@@ -244,12 +253,14 @@
                         android:focusable="false"
                         android:clickable="true"
                         android:cursorVisible="false"
-                        android:importantForAutofill="no" />
+                        android:importantForAutofill="no"
+                        android:textColor="@color/white"
+                        android:textColorHint="@color/light_gray" />
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/tilMouthType"
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                    style="@style/Widget.TaskTimer.OutlinedDropdown"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
@@ -262,12 +273,14 @@
                         android:focusable="false"
                         android:clickable="true"
                         android:cursorVisible="false"
-                        android:importantForAutofill="no" />
+                        android:importantForAutofill="no"
+                        android:textColor="@color/white"
+                        android:textColorHint="@color/light_gray" />
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/tilFacialHairType"
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                    style="@style/Widget.TaskTimer.OutlinedDropdown"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
@@ -280,12 +293,14 @@
                         android:focusable="false"
                         android:clickable="true"
                         android:cursorVisible="false"
-                        android:importantForAutofill="no" />
+                        android:importantForAutofill="no"
+                        android:textColor="@color/white"
+                        android:textColorHint="@color/light_gray" />
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/tilFacialHairColor"
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                    style="@style/Widget.TaskTimer.OutlinedDropdown"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
@@ -298,7 +313,9 @@
                         android:focusable="false"
                         android:clickable="true"
                         android:cursorVisible="false"
-                        android:importantForAutofill="no" />
+                        android:importantForAutofill="no"
+                        android:textColor="@color/white"
+                        android:textColorHint="@color/light_gray" />
                 </com.google.android.material.textfield.TextInputLayout>
 
             </LinearLayout>
@@ -314,11 +331,13 @@
                     style="?attr/materialButtonOutlinedStyle"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Background" />
+                    android:text="Background"
+                    app:backgroundTint="@color/gold"
+                    android:textColor="@color/charcoal" />
 
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/tilSkinColor"
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                    style="@style/Widget.TaskTimer.OutlinedDropdown"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="12dp"
@@ -340,7 +359,9 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="12dp"
-                    android:text="Save" />
+                    android:text="Save"
+                    app:backgroundTint="@color/gold"
+                    android:textColor="@color/charcoal" />
             </LinearLayout>
 
         </LinearLayout>

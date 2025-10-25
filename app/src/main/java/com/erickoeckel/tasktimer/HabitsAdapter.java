@@ -74,9 +74,18 @@ public class HabitsAdapter extends RecyclerView.Adapter<HabitsAdapter.VH> {
 
         String todayStr = today();
         boolean isTodayChecked = todayStr.equals(hb.getLastCompleted());
+        int dow = java.util.Calendar.getInstance().get(java.util.Calendar.DAY_OF_WEEK);
+        int todayIdx = (dow == java.util.Calendar.SUNDAY) ? 0 : (dow - java.util.Calendar.SUNDAY);
+
+        boolean isScheduledToday = false;
+        java.util.List<Boolean> sched = hb.getDays();
+        if (sched != null && sched.size() >= 7) {
+            Boolean v = sched.get(todayIdx);
+            isScheduledToday = (v != null && v);
+        }
 
         if (opener != null) {
-            if (!isTodayChecked) {
+            if (isScheduledToday && !isTodayChecked) {
                 h.itemView.setOnClickListener(v -> opener.onOpen(hb));
                 h.itemView.setClickable(true);
                 h.itemView.setEnabled(true);

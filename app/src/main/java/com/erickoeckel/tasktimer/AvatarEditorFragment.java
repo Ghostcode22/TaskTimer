@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import androidx.navigation.fragment.NavHostFragment;
 
 public class AvatarEditorFragment extends Fragment {
 
@@ -243,8 +244,12 @@ public class AvatarEditorFragment extends Fragment {
                 .collection("users")
                 .document(uid)
                 .update("avatarConfig", clean.toMap())
-                .addOnSuccessListener(aVoid -> Log.d(TAG, "Saved avatarConfig to Firestore"))
+                .addOnSuccessListener(aVoid -> {
+                    Log.d(TAG, "Saved avatarConfig to Firestore");
+                    NavHostFragment.findNavController(AvatarEditorFragment.this).popBackStack();
+                })
                 .addOnFailureListener(e -> Log.e(TAG, "Failed to save avatarConfig", e));
+
     }
 
     private void refresh() {

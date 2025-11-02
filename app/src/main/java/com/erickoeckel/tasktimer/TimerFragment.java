@@ -59,7 +59,6 @@ public class TimerFragment extends Fragment {
             vm.pause();
             vm.resetToFocus();
             setTabsEnabled(true);
-
             sourceType = sourceId = sourceTitle = null;
             NavHostFragment.findNavController(TimerFragment.this).popBackStack();
         });
@@ -79,12 +78,6 @@ public class TimerFragment extends Fragment {
                         HabitsViewModel hVm = new ViewModelProvider(requireActivity()).get(HabitsViewModel.class);
                         hVm.completeTodayWithInfo(sourceId);
                     }
-
-                    vm.pause();
-                    vm.resetToFocus();
-                    setTabsEnabled(true);
-
-                    sourceType = sourceId = sourceTitle = null;
                 }
 
             }
@@ -145,8 +138,12 @@ public class TimerFragment extends Fragment {
             btnComplete.setVisibility(View.GONE);
             btnComplete.setEnabled(true);
             showCompleteAfterBreak = false;
-            sourceType = sourceId = sourceTitle = null;
             tvWorkingOn.setVisibility(View.GONE);
+
+            setTabsEnabled(true);
+            NavHostFragment.findNavController(TimerFragment.this).popBackStack();
+
+            sourceType = sourceId = sourceTitle = null;
         });
 
         Bundle args = getArguments();

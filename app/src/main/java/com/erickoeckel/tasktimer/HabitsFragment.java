@@ -23,7 +23,7 @@ public class HabitsFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_habits, container, false);
 
-        vm = new ViewModelProvider(this).get(HabitsViewModel.class);
+        vm = new ViewModelProvider(requireActivity()).get(HabitsViewModel.class);
 
         RecyclerView rv = v.findViewById(R.id.rvHabits);
         rv.setLayoutManager(new LinearLayoutManager(getContext()));

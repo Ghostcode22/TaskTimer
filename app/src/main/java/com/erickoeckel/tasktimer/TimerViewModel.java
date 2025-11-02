@@ -8,12 +8,13 @@ import androidx.lifecycle.ViewModel;
 public class TimerViewModel extends ViewModel {
 
     public enum Phase { FOCUS, BREAK }
-    public static final long FOCUS_MILLIS = 25L * 60L * 1000L;
-    public static final long BREAK_MILLIS = 5L  * 60L * 1000L;
+    public static final long FOCUS_MILLIS = 2L * 60L * 1000L;
+    public static final long BREAK_MILLIS = 1L  * 60L * 1000L;
     private final MutableLiveData<Long> remaining = new MutableLiveData<>(FOCUS_MILLIS);
     private final MutableLiveData<Phase> phase = new MutableLiveData<>(Phase.FOCUS);
     private final MutableLiveData<Boolean> running = new MutableLiveData<>(false);
     private CountDownTimer timer;
+    private boolean transitionInFlight = false;
     public LiveData<Long> getRemaining() { return remaining; }
     public LiveData<Phase> getPhase() { return phase; }
     public LiveData<Boolean> isRunning() { return running; }
@@ -36,8 +37,13 @@ public class TimerViewModel extends ViewModel {
                 remaining.setValue(millisUntilFinished);
             }
             @Override public void onFinish() {
+                if (transitionInFlight) return;
+                transitionInFlight = true;
+
                 running.setValue(false);
                 remaining.setValue(0L);
+
+                cancelTimerIfAny();
 
                 if (phase.getValue() == Phase.FOCUS) {
                     phase.setValue(Phase.BREAK);
@@ -46,7 +52,10 @@ public class TimerViewModel extends ViewModel {
                     phase.setValue(Phase.FOCUS);
                     remaining.setValue(FOCUS_MILLIS);
                 }
+
+                transitionInFlight = false;
             }
+
         }.start();
     }
 

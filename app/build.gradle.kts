@@ -1,24 +1,47 @@
 plugins {
-    alias(libs.plugins.android.application)
-    id ("com.google.gms.google-services")
+    id("com.android.application")
+    id("com.google.gms.google-services")
+    id("com.google.firebase.crashlytics")
 }
 
 android {
     namespace = "com.erickoeckel.tasktimer"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.erickoeckel.tasktimer"
         minSdk = 24
-        targetSdk = 34
-        versionCode = 1
-        versionName = "1.0"
+        targetSdk = 35
+        versionCode = 5
+        versionName = "1.0.4"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
     buildFeatures {
         viewBinding = true
+        buildConfig = true
+    }
+
+    signingConfigs {
+        create("release") {
+            storeFile = file("../keystore/tasktimer-upload.jks")
+            keyAlias = "upload"
+            storePassword = System.getenv("TT_KEYSTORE_PWD") ?: ""
+            keyPassword  = System.getenv("TT_KEY_PWD") ?: ""
+        }
+    }
+    buildTypes {
+        getByName("release") {
+            signingConfig = signingConfigs.getByName("release")
+            isMinifyEnabled = false
+            isShrinkResources = false
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
+            isDebuggable = false
+        }
     }
 
     compileOptions {
@@ -42,7 +65,7 @@ dependencies {
     implementation ("androidx.navigation:navigation-fragment:2.7.7")
     implementation ("androidx.navigation:navigation-ui:2.7.7")
     implementation ("androidx.core:core-splashscreen:1.0.1")
-    implementation (platform("com.google.firebase:firebase-bom:33.1.2"))
+    implementation (platform("com.google.firebase:firebase-bom:33.5.1"))
     implementation ("com.google.firebase:firebase-auth")
     implementation ("com.google.firebase:firebase-firestore")
     implementation ("androidx.datastore:datastore-preferences:1.1.1")
@@ -57,4 +80,6 @@ dependencies {
     annotationProcessor("com.github.bumptech.glide:compiler:4.16.0")
     implementation("com.caverock:androidsvg:1.4")
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
+    implementation("com.google.firebase:firebase-crashlytics")
+    implementation("com.google.firebase:firebase-analytics")
 }

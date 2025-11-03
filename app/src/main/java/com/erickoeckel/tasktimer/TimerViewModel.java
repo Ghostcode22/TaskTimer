@@ -8,8 +8,8 @@ import androidx.lifecycle.ViewModel;
 public class TimerViewModel extends ViewModel {
 
     public enum Phase { FOCUS, BREAK }
-    public static final long FOCUS_MILLIS = 2L * 60L * 1000L;
-    public static final long BREAK_MILLIS = 1L  * 60L * 1000L;
+    public static final long FOCUS_MILLIS = 25L * 60L * 1000L;
+    public static final long BREAK_MILLIS = 5L  * 60L * 1000L;
     private final MutableLiveData<Long> remaining = new MutableLiveData<>(FOCUS_MILLIS);
     private final MutableLiveData<Phase> phase = new MutableLiveData<>(Phase.FOCUS);
     private final MutableLiveData<Boolean> running = new MutableLiveData<>(false);

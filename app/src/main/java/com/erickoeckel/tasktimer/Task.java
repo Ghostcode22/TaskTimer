@@ -6,6 +6,9 @@ public class Task {
     private boolean done;
     private String dueDate;
 
+    @com.google.firebase.firestore.ServerTimestamp
+    private java.util.Date createdAt;
+
     public Task() {}
 
     public Task(String id, String title) {
@@ -13,6 +16,7 @@ public class Task {
         this.title = title;
         this.done = false;
         this.dueDate = null;
+        this.createdAt = null;
     }
 
     public String getId() { return id; }
@@ -26,6 +30,9 @@ public class Task {
 
     public String getDueDate() { return dueDate; }
     public void setDueDate(String dueDate) { this.dueDate = dueDate; }
+
+    public java.util.Date getCreatedAt() { return createdAt; }
+    public void setCreatedAt(java.util.Date d) { this.createdAt = d; }
 }
 
 

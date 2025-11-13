@@ -117,4 +117,53 @@
         <item name="android:textColorHint">@color/light_gray</item>
     </style>
 
+    <style name="ThemeOverlay.TaskTimer.FixedCharcoal" parent="ThemeOverlay.Material3">
+        <item name="colorSurface">@color/charcoal</item>
+        <item name="colorOnSurface">@color/white</item>
+        <item name="android:colorBackground">@color/charcoal</item>
+        <item name="colorOnBackground">@color/white</item>
+        <item name="colorPrimary">@color/gold</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <item name="colorOutline">@color/soft_gold</item>
+        <item name="android:forceDarkAllowed">false</item>
+    </style>
+
+    <style name="ThemeOverlay.TaskTimer.Dialog.Charcoal" parent="ThemeOverlay.Material3.MaterialAlertDialog">
+        <item name="colorSurface">@color/charcoal</item>
+        <item name="colorOnSurface">@color/gold</item>
+        <item name="colorPrimary">@color/gold</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <item name="android:forceDarkAllowed">false</item>
+    </style>
+
+    <style name="TextAppearance.TaskTimer.DialogTitle" parent="TextAppearance.Material3.TitleLarge">
+        <item name="android:textColor">@color/gold</item>
+    </style>
+    <style name="TextAppearance.TaskTimer.DialogBody" parent="TextAppearance.Material3.BodyMedium">
+        <item name="android:textColor">@color/white</item>
+    </style>
+
+    <style name="Widget.TaskTimer.TextInputLayout.OnCharcoal" parent="Widget.Material3.TextInputLayout.OutlinedBox">
+        <item name="boxStrokeColor">@color/soft_gold</item>
+        <item name="boxStrokeWidth">1dp</item>
+        <item name="boxStrokeWidthFocused">2dp</item>
+        <item name="hintTextColor">@color/soft_gold</item>
+        <item name="android:textColorHint">@color/soft_gold</item>
+    </style>
+    <style name="Text.TaskTimer.Input.OnCharcoal" parent="TextAppearance.Material3.BodyLarge">
+        <item name="android:textColor">@color/white</item>
+        <item name="android:textColorHint">@color/soft_gold</item>
+    </style>
+
+    <style name="Widget.TaskTimer.EditText.Plain.OnCharcoal" parent="@android:style/Widget.EditText">
+        <item name="android:textColor">@color/white</item>
+        <item name="android:textColorHint">@color/soft_gold</item>
+        <item name="android:backgroundTint">@color/soft_gold</item>
+    </style>
+
+    <style name="Widget.TaskTimer.CheckBox.OnCharcoal" parent="Widget.Material3.CompoundButton.CheckBox">
+        <item name="android:textColor">@color/white</item>
+        <item name="buttonTint">@color/gold</item>
+    </style>
+
 </resources>

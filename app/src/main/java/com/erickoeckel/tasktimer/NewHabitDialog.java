@@ -7,7 +7,7 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import androidx.fragment.app.DialogFragment;
 
 public class NewHabitDialog extends DialogFragment {
@@ -29,7 +29,10 @@ public class NewHabitDialog extends DialogFragment {
         sun.setChecked(true); mon.setChecked(true); tue.setChecked(true); wed.setChecked(true);
         thu.setChecked(true); fri.setChecked(true); sat.setChecked(true);
 
-        return new AlertDialog.Builder(requireContext())
+        return new MaterialAlertDialogBuilder(
+                requireContext(),
+                R.style.ThemeOverlay_TaskTimer_Dialog_Charcoal
+        )
                 .setTitle("New Habit")
                 .setView(v)
                 .setPositiveButton("Create", (d, w) -> {
@@ -38,14 +41,14 @@ public class NewHabitDialog extends DialogFragment {
                         et.setError("Title required");
                         return;
                     }
-                    boolean[] days = new boolean[]{
+                    boolean[] days = new boolean[] {
                             sun.isChecked(), mon.isChecked(), tue.isChecked(),
                             wed.isChecked(), thu.isChecked(), fri.isChecked(), sat.isChecked()
                     };
                     if (cb != null) cb.onCreate(new Payload(title, days));
                 })
-
                 .setNegativeButton("Cancel", null)
                 .create();
+
     }
 }

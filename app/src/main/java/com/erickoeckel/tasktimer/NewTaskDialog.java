@@ -56,17 +56,25 @@ public class NewTaskDialog extends DialogFragment {
             tvDue.setText("None");
         });
 
-        return new MaterialAlertDialogBuilder(requireContext(), R.style.ThemeOverlay_TaskTimer_Dialog)
+        return new MaterialAlertDialogBuilder(
+                requireContext(),
+                R.style.ThemeOverlay_TaskTimer_Dialog_Charcoal
+        )
                 .setTitle("New Task")
                 .setView(v)
-                .setNegativeButton("Cancel", (d,w) -> {})
-                .setPositiveButton("Create", (d,w) -> {
+                .setNegativeButton("Cancel", (d, w) -> { /* no-op */ })
+                .setPositiveButton("Create", (d, w) -> {
                     String title = String.valueOf(etTitle.getText()).trim();
                     if (title.isEmpty()) return;
-                    String dueYmd = (selectedUtcMidnight == null) ? null : toLocalYMD(selectedUtcMidnight);
+
+                    String dueYmd = (selectedUtcMidnight == null)
+                            ? null
+                            : toLocalYMD(selectedUtcMidnight);
+
                     if (cb != null) cb.onCreate(title, dueYmd);
                 })
                 .create();
+
     }
 
     private static String toLocalYMD(long utcMs) {

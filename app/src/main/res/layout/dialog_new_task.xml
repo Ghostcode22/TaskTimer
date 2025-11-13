@@ -3,17 +3,19 @@
     android:padding="16dp"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:theme="@style/ThemeOverlay.TaskTimer.FixedCharcoal"
+    android:forceDarkAllowed="false">
 
     <com.google.android.material.textfield.TextInputLayout
-        style="@style/Widget.TaskTimer.TextInputLayout"
+        style="@style/Widget.TaskTimer.TextInputLayout.OnCharcoal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Task title">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/etTaskTitle"
-            style="@style/Text.TaskTimer.Input"
+            style="@style/Text.TaskTimer.Input.OnCharcoal"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>
     </com.google.android.material.textfield.TextInputLayout>
@@ -30,7 +32,7 @@
             android:layout_height="wrap_content"
             android:text="Due date:"
             android:textStyle="bold"
-            android:textColor="@color/navy"
+            android:textColor="@color/white"
             android:paddingEnd="8dp"/>
 
         <TextView
@@ -39,16 +41,18 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="None"
-            android:textColor="@color/navy"/>
+            android:textColor="@color/soft_gold"/>
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnPickDue"
+            style="@style/Widget.TaskTimer.PrimaryButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Pick"/>
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnClearDue"
+            style="@style/Widget.TaskTimer.PrimaryButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Clear"

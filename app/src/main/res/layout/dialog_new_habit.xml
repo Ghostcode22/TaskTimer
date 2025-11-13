@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:theme="@style/ThemeOverlay.TaskTimer.FixedCharcoal"
+    android:forceDarkAllowed="false">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -9,18 +11,24 @@
         android:orientation="vertical"
         android:padding="16dp">
 
-        <EditText
-            android:id="@+id/etHabitTitle"
+        <com.google.android.material.textfield.TextInputLayout
+            style="@style/Widget.TaskTimer.TextInputLayout.OnCharcoal"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/habit_title_e_g_drink_water"
-            android:inputType="textCapSentences"
-            android:autofillHints="name" />
+            android:hint="@string/habit_title_e_g_drink_water">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etHabitTitle"
+                style="@style/Text.TaskTimer.Input.OnCharcoal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+        </com.google.android.material.textfield.TextInputLayout>
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/repeat_on"
+            android:textColor="@color/white"
             android:paddingTop="12dp" />
 
         <LinearLayout
@@ -30,24 +38,28 @@
 
             <CheckBox
                 android:id="@+id/d0"
+                style="@style/Widget.TaskTimer.CheckBox.OnCharcoal"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/sun" />
 
             <CheckBox
                 android:id="@+id/d1"
+                style="@style/Widget.TaskTimer.CheckBox.OnCharcoal"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/mon" />
 
             <CheckBox
                 android:id="@+id/d2"
+                style="@style/Widget.TaskTimer.CheckBox.OnCharcoal"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/tue" />
 
             <CheckBox
                 android:id="@+id/d3"
+                style="@style/Widget.TaskTimer.CheckBox.OnCharcoal"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/wed" />
@@ -60,18 +72,21 @@
 
             <CheckBox
                 android:id="@+id/d4"
+                style="@style/Widget.TaskTimer.CheckBox.OnCharcoal"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/thu" />
 
             <CheckBox
                 android:id="@+id/d5"
+                style="@style/Widget.TaskTimer.CheckBox.OnCharcoal"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/fri" />
 
             <CheckBox
                 android:id="@+id/d6"
+                style="@style/Widget.TaskTimer.CheckBox.OnCharcoal"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/sat" />

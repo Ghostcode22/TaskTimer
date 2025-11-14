@@ -47,17 +47,25 @@ public class AuthActivity extends AppCompatActivity {
         progress = findViewById(R.id.progress);
         tvError = findViewById(R.id.tvError);
 
+        toggle.check(R.id.btnLoginMode);
+        applyMode(false);
+
         toggle.addOnButtonCheckedListener((group, checkedId, isChecked) -> {
             if (!isChecked) return;
-            isRegister = (checkedId == R.id.btnRegisterMode);
-            btnSubmit.setText(isRegister ? "Create Account" : "Login");
-            if (tilUsername != null) {
-                tilUsername.setVisibility(isRegister ? View.VISIBLE : View.GONE);
-            }
-            tvError.setVisibility(View.GONE);
+            boolean toRegister = (checkedId == R.id.btnRegisterMode);
+            applyMode(toRegister);
         });
 
         btnSubmit.setOnClickListener(v -> submit());
+    }
+
+    private void applyMode(boolean register) {
+        isRegister = register;
+        if (tilUsername != null) {
+            tilUsername.setVisibility(register ? View.VISIBLE : View.GONE);
+        }
+        btnSubmit.setText(register ? "Create Account" : "Login");
+        tvError.setVisibility(View.GONE);
     }
 
     private void submit() {
@@ -82,7 +90,7 @@ public class AuthActivity extends AppCompatActivity {
         setLoading(true);
 
         if (isRegister) {
-            final String chosenUsername = username; // ✅ make it final for lambdas
+            final String chosenUsername = username;
 
             auth.createUserWithEmailAndPassword(email, pass)
                     .addOnCompleteListener(task -> {

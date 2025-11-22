@@ -93,30 +93,15 @@
                         android:textColorHint="@color/light_gray" />
                 </com.google.android.material.textfield.TextInputLayout>
 
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/groupAccessories"
-                android:orientation="vertical"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp">
-
-                <com.google.android.material.textview.MaterialTextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Accessories"
-                    android:textStyle="bold" />
-
                 <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/tilAccessoriesType"
+                    android:id="@+id/tilFacialHairType"
                     style="@style/Widget.TaskTimer.OutlinedDropdown"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
-                    android:hint="accessoriesType">
+                    android:hint="facialHairType">
                     <com.google.android.material.textfield.MaterialAutoCompleteTextView
-                        android:id="@+id/ddAccessoriesType"
+                        android:id="@+id/ddFacialHairType"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:inputType="none"
@@ -128,6 +113,25 @@
                         android:textColorHint="@color/light_gray" />
                 </com.google.android.material.textfield.TextInputLayout>
 
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/tilFacialHairColor"
+                    style="@style/Widget.TaskTimer.OutlinedDropdown"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:hint="facialHairColor">
+                    <com.google.android.material.textfield.MaterialAutoCompleteTextView
+                        android:id="@+id/ddFacialHairColor"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="none"
+                        android:focusable="false"
+                        android:clickable="true"
+                        android:cursorVisible="false"
+                        android:importantForAutofill="no"
+                        android:textColor="@color/white"
+                        android:textColorHint="@color/light_gray" />
+                </com.google.android.material.textfield.TextInputLayout>
             </LinearLayout>
 
             <LinearLayout
@@ -192,6 +196,26 @@
                     android:hint="graphicType">
                     <com.google.android.material.textfield.MaterialAutoCompleteTextView
                         android:id="@+id/ddGraphicType"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="none"
+                        android:focusable="false"
+                        android:clickable="true"
+                        android:cursorVisible="false"
+                        android:importantForAutofill="no"
+                        android:textColor="@color/white"
+                        android:textColorHint="@color/light_gray" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/tilAccessoriesType"
+                    style="@style/Widget.TaskTimer.OutlinedDropdown"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:hint="accessoriesType">
+                    <com.google.android.material.textfield.MaterialAutoCompleteTextView
+                        android:id="@+id/ddAccessoriesType"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:inputType="none"
@@ -278,62 +302,7 @@
                         android:textColorHint="@color/light_gray" />
                 </com.google.android.material.textfield.TextInputLayout>
 
-                <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/tilFacialHairType"
-                    style="@style/Widget.TaskTimer.OutlinedDropdown"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:hint="facialHairType">
-                    <com.google.android.material.textfield.MaterialAutoCompleteTextView
-                        android:id="@+id/ddFacialHairType"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:inputType="none"
-                        android:focusable="false"
-                        android:clickable="true"
-                        android:cursorVisible="false"
-                        android:importantForAutofill="no"
-                        android:textColor="@color/white"
-                        android:textColorHint="@color/light_gray" />
-                </com.google.android.material.textfield.TextInputLayout>
 
-                <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/tilFacialHairColor"
-                    style="@style/Widget.TaskTimer.OutlinedDropdown"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:hint="facialHairColor">
-                    <com.google.android.material.textfield.MaterialAutoCompleteTextView
-                        android:id="@+id/ddFacialHairColor"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:inputType="none"
-                        android:focusable="false"
-                        android:clickable="true"
-                        android:cursorVisible="false"
-                        android:importantForAutofill="no"
-                        android:textColor="@color/white"
-                        android:textColorHint="@color/light_gray" />
-                </com.google.android.material.textfield.TextInputLayout>
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:orientation="vertical"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="20dp">
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnAvatarStyle"
-                    style="?attr/materialButtonOutlinedStyle"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Background"
-                    app:backgroundTint="@color/gold"
-                    android:textColor="@color/charcoal" />
 
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/tilSkinColor"
@@ -352,6 +321,20 @@
                         android:cursorVisible="false"
                         android:importantForAutofill="no" />
                 </com.google.android.material.textfield.TextInputLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp">
+
+                <com.google.android.material.materialswitch.MaterialSwitch
+                    android:id="@+id/btnAvatarStyle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Background"
+                    android:textColor="@color/white"/>
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnSave"

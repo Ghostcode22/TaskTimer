@@ -1,16 +1,19 @@
 package com.erickoeckel.tasktimer;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewParent;
 import android.widget.ImageView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.materialswitch.MaterialSwitch;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.textfield.MaterialAutoCompleteTextView;
 import com.google.firebase.auth.FirebaseAuth;
@@ -19,12 +22,15 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.ListenerRegistration;
 import android.widget.ArrayAdapter;
+import android.widget.ListAdapter;
+import android.widget.TextView;
 import android.widget.Toast;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import androidx.navigation.fragment.NavHostFragment;
+import com.google.android.material.textfield.TextInputLayout;
 
 public class AvatarEditorFragment extends Fragment {
 
@@ -91,7 +97,7 @@ public class AvatarEditorFragment extends Fragment {
     private ImageView ivPreview;
 
     private TabLayout tabs;
-    private View groupHair, groupClothes, groupAccessories, groupFace;
+    private View groupHair, groupClothes, groupFace;
 
     private Map<String, Boolean> unlocks = new HashMap<>();
     private ListenerRegistration unlocksReg;
@@ -99,6 +105,8 @@ public class AvatarEditorFragment extends Fragment {
     private MaterialAutoCompleteTextView ddTopType, ddAccessoriesType, ddClotheType, ddClotheColor,
             ddGraphicType, ddHairColor, ddFacialHairType, ddFacialHairColor, ddEyeType, ddEyebrowType,
             ddMouthType, ddSkinColor;
+
+    private TextInputLayout tilHairColor, tilFacialHairColor, tilGraphicType;
 
     @Nullable @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -114,11 +122,10 @@ public class AvatarEditorFragment extends Fragment {
 
         tabs = root.findViewById(R.id.tabs);
         if (tabs != null) {
-            if (tabs.getTabCount() != 4) {
+            if (tabs.getTabCount() != 3) {
                 tabs.removeAllTabs();
                 tabs.addTab(tabs.newTab().setText("Hair"));
                 tabs.addTab(tabs.newTab().setText("Clothes"));
-                tabs.addTab(tabs.newTab().setText("Accessories"));
                 tabs.addTab(tabs.newTab().setText("Face"));
             }
             tabs.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
@@ -132,18 +139,18 @@ public class AvatarEditorFragment extends Fragment {
 
         groupHair        = root.findViewById(R.id.groupHair);
         groupClothes     = root.findViewById(R.id.groupClothes);
-        groupAccessories = root.findViewById(R.id.groupAccessories);
         groupFace        = root.findViewById(R.id.groupFace);
 
-        MaterialButton btnAvatarStyle = root.findViewById(R.id.btnAvatarStyle);
+        MaterialSwitch btnAvatarStyle = root.findViewById(R.id.btnAvatarStyle);
         MaterialButton btnSave        = root.findViewById(R.id.btnSave);
 
-        if (btnAvatarStyle != null) {
-            btnAvatarStyle.setOnClickListener(v -> {
-                cfg.background = !cfg.background;
-                refresh();
-            });
-        }
+        btnAvatarStyle.setChecked(cfg.background);
+
+        btnAvatarStyle.setOnCheckedChangeListener((buttonView, isChecked)-> {
+            cfg.background = isChecked;
+            refresh();
+        });
+
         if (btnSave != null) {
             btnSave.setOnClickListener(v -> {
                 Log.d(TAG, "SAVE avatarConfig: " + cfg.toMap());
@@ -164,6 +171,10 @@ public class AvatarEditorFragment extends Fragment {
         ddMouthType       = root.findViewById(R.id.ddMouthType);
         ddSkinColor       = root.findViewById(R.id.ddSkinColor);
 
+        tilHairColor       = root.findViewById(R.id.tilHairColor);
+        tilFacialHairColor = root.findViewById(R.id.tilFacialHairColor);
+        tilGraphicType     = root.findViewById(R.id.tilGraphicType);
+
         startUnlocksListener();
         buildAllDropdowns();
 
@@ -175,8 +186,7 @@ public class AvatarEditorFragment extends Fragment {
     private void showSection(int index) {
         setVisible(groupHair,        index == 0);
         setVisible(groupClothes,     index == 1);
-        setVisible(groupAccessories, index == 2);
-        setVisible(groupFace,        index == 3);
+        setVisible(groupFace,        index == 2);
     }
 
     private void setVisible(View v, boolean visible) {
@@ -255,6 +265,7 @@ public class AvatarEditorFragment extends Fragment {
     private void refresh() {
         sanitizeForAvataaars(cfg);
         updateDropdownEnables();
+        updateConditionalRowsVisibility();
         if (ivPreview != null) {
             AvatarSvgLoader.load(ivPreview, cfg, "EDITOR");
         }
@@ -464,27 +475,28 @@ public class AvatarEditorFragment extends Fragment {
                              @NonNull OnPick<String> onPick) {
         if (dd == null) return;
 
-        List<String> display = new ArrayList<>(values.length);
-        for (String v : values) {
-            boolean ok = checker.isUnlocked(unlocks, v);
-            display.add(ok ? v : (v + "  🔒"));
-        }
-
-        ArrayAdapter<String> ad = new ArrayAdapter<>(requireContext(),
-                android.R.layout.simple_list_item_1, display);
+        String current = currentFor(dd);
+        CheckedAdapter ad = new CheckedAdapter(requireContext(), values, checker, unlocks, current);
         dd.setAdapter(ad);
+        if (current != null) dd.setText(current, false);
 
         dd.setOnItemClickListener((parent, view, position, id) -> {
             String picked = values[position];
             boolean ok = checker.isUnlocked(unlocks, picked);
             if (!ok) {
                 Toast.makeText(requireContext(), "Locked — buy in Shop", Toast.LENGTH_SHORT).show();
-                selectIn(dd, currentFor(dd));
+                String cur = currentFor(dd);
+                ad.setSelectedKey(cur);
+                if (cur != null) dd.setText(cur, false);
                 return;
             }
             onPick.accept(picked);
+            ad.setSelectedKey(picked);
+            dd.setText(picked, false);
             refresh();
         });
+
+        attachPopupRecenter(dd);
     }
 
     private interface UnlockCheck {
@@ -499,17 +511,31 @@ public class AvatarEditorFragment extends Fragment {
                                 @NonNull String[] values,
                                 @NonNull java.util.function.Consumer<String> apply) {
         if (dd == null) return;
-        ArrayAdapter<String> ad = new ArrayAdapter<>(requireContext(), android.R.layout.simple_list_item_1, values);
+
+        UnlockCheck always = (map, slug) -> true;
+        String current = currentFor(dd);
+        CheckedAdapter ad = new CheckedAdapter(requireContext(), values, always, unlocks, current);
         dd.setAdapter(ad);
+        if (current != null) dd.setText(current, false);
+
         dd.setOnItemClickListener((p, v, pos, id) -> {
-            apply.accept(values[pos]);
+            String picked = values[pos];
+            apply.accept(picked);
+            ad.setSelectedKey(picked);
+            dd.setText(picked, false);
             refresh();
         });
+
+        attachPopupRecenter(dd);
     }
 
     private void selectIn(@Nullable MaterialAutoCompleteTextView dd, @Nullable String value) {
         if (dd == null || value == null) return;
         dd.setText(value, false);
+        ListAdapter a = dd.getAdapter();
+        if (a instanceof CheckedAdapter) {
+            ((CheckedAdapter) a).setSelectedKey(value);
+        }
     }
 
     private void makeReadOnly(@Nullable com.google.android.material.textfield.MaterialAutoCompleteTextView dd) {
@@ -523,7 +549,19 @@ public class AvatarEditorFragment extends Fragment {
         dd.setOnFocusChangeListener((v, has) -> { if (has) dd.showDropDown(); });
     }
 
+    private void updateConditionalRowsVisibility() {
+        boolean showHairColor =
+                isHairTop(cfg.top) && !isHatTop(cfg.top) && !isHeadCover(cfg.top) && !"NoHair".equals(cfg.top);
 
+        boolean showFacialHairColor =
+                cfg.facialHairOn && cfg.facialHair != null && !"Blank".equals(cfg.facialHair);
+
+        boolean showGraphic = "GraphicShirt".equals(cfg.clothing);
+
+        setVisible(tilHairColor, showHairColor);
+        setVisible(tilFacialHairColor, showFacialHairColor);
+        setVisible(tilGraphicType, showGraphic);
+    }
 
     @Nullable private String currentFor(@NonNull MaterialAutoCompleteTextView dd) {
         if (dd == ddTopType) return cfg.top;
@@ -541,4 +579,111 @@ public class AvatarEditorFragment extends Fragment {
     }
 
     private static String safe(String s, String d) { return (s == null || s.isEmpty()) ? d : s; }
+
+    @Nullable
+    private TextInputLayout findTextInputLayout(View child) {
+        View p = child;
+        while (p != null && !(p instanceof TextInputLayout)) {
+            final ViewParent parent = p.getParent();
+            p = (parent instanceof View) ? (View) parent : null;
+        }
+        return (p instanceof TextInputLayout) ? (TextInputLayout) p : null;
+    }
+
+    private int selectedIndexOf(MaterialAutoCompleteTextView dd) {
+        ListAdapter a = dd.getAdapter();
+        if (a == null) return -1;
+
+        if (a instanceof CheckedAdapter) {
+            CheckedAdapter ca = (CheckedAdapter) a;
+            String sel = ca.getSelectedKey();
+            return ca.getPosition(sel);
+        } else {
+            String cur = currentFor(dd);
+            if (cur == null) return -1;
+            for (int i = 0; i < a.getCount(); i++) {
+                Object it = a.getItem(i);
+                if (cur.equals(it)) return i;
+            }
+            return -1;
+        }
+    }
+
+    private void attachPopupRecenter(MaterialAutoCompleteTextView dd) {
+        View.OnClickListener openAndCenter = v -> {
+            if (!dd.isPopupShowing()) dd.showDropDown();
+            dd.post(() -> {
+                int idx = selectedIndexOf(dd);
+                if (idx >= 0) dd.setListSelection(idx);
+            });
+        };
+
+        dd.setOnClickListener(openAndCenter);
+
+        dd.setOnFocusChangeListener((v, has) -> { if (has) openAndCenter.onClick(v); });
+
+        TextInputLayout til = findTextInputLayout(dd);
+        if (til != null) {
+            til.setEndIconOnClickListener(v -> {
+                if (dd.isPopupShowing()) {
+                    dd.dismissDropDown();
+                } else {
+                    dd.showDropDown();
+                    dd.post(() -> {
+                        int idx = selectedIndexOf(dd);
+                        if (idx >= 0) dd.setListSelection(idx);
+                    });
+                }
+            });
+        }
+    }
+
+    private static class CheckedAdapter extends ArrayAdapter<String> {
+        private final List<String> data;
+        private final Map<String, Boolean> unlocks;
+        private final UnlockCheck checker;
+        private String selectedKey;
+
+        CheckedAdapter(@NonNull Context ctx,
+                       @NonNull String[] values,
+                       @Nullable UnlockCheck checker,
+                       @NonNull Map<String, Boolean> unlocks,
+                       @Nullable String selected) {
+            super(ctx, 0, values);
+            this.data = Arrays.asList(values);
+            this.unlocks = unlocks;
+            this.checker = checker;
+            this.selectedKey = selected;
+        }
+
+        void setSelectedKey(@Nullable String k) { selectedKey = k; notifyDataSetChanged(); }
+        @Nullable String getSelectedKey() { return selectedKey; }
+
+        @Override public int getCount() { return data.size(); }
+        @Override public String getItem(int position) { return data.get(position); }
+        @Override public int getPosition(@Nullable String item) { return data.indexOf(item); }
+
+        @Override public View getView(int position, View convertView, ViewGroup parent) {
+            return buildRow(position, convertView, parent);
+        }
+        @Override public View getDropDownView(int position, View convertView, ViewGroup parent) {
+            return buildRow(position, convertView, parent);
+        }
+
+        private View buildRow(int position, View convertView, ViewGroup parent) {
+            View v = (convertView != null)
+                    ? convertView
+                    : LayoutInflater.from(getContext()).inflate(R.layout.item_dropdown_checked, parent, false);
+            TextView label = v.findViewById(R.id.label);
+            ImageView check = v.findViewById(R.id.check);
+
+            String key = data.get(position);
+            boolean unlocked = (checker == null) || checker.isUnlocked(unlocks, key);
+
+            label.setText(unlocked ? key : (key + "  🔒"));
+            check.setVisibility(key.equals(selectedKey) ? View.VISIBLE : View.GONE);
+            return v;
+        }
+    }
+
 }

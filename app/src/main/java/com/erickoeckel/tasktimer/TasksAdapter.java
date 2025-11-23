@@ -4,6 +4,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -19,27 +20,40 @@ public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.VH> {
     public interface Opener {
         void onOpen(@NonNull Task task);
     }
+    public interface Remover {
+        void onRemove(@NonNull String taskId);
+    }
 
     private final Toggle toggle;
     @Nullable private final Opener opener;
-    private final List<Task> data = new ArrayList<>();
-    boolean isDone;
+    @Nullable private final Remover remover;
 
-    public TasksAdapter(@NonNull Toggle toggle) { this(toggle, null); }
+    private final List<Task> data = new ArrayList<>();
+
+    public TasksAdapter(@NonNull Toggle toggle) { this(toggle, null, null); }
 
     public TasksAdapter(@NonNull Toggle toggle, @Nullable Opener opener) {
-        this.toggle = toggle;
-        this.opener = opener;
+        this(toggle, opener, null);
     }
 
+    public TasksAdapter(@NonNull Toggle toggle, @Nullable Opener opener, @Nullable Remover remover) {
+        this.toggle = toggle;
+        this.opener = opener;
+        this.remover = remover;
+    }
 
     public static class VH extends RecyclerView.ViewHolder {
         CheckBox cb;
         TextView title;
+        ImageButton btnDelete;
+        TextView tvDue;
+
         public VH(@NonNull View v) {
             super(v);
             cb = v.findViewById(R.id.cb);
             title = v.findViewById(R.id.title);
+            tvDue = v.findViewById(R.id.tvDue);
+            btnDelete = v.findViewById(R.id.btnDelete);
         }
     }
 
@@ -52,7 +66,8 @@ public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.VH> {
     @Override
     public void onBindViewHolder(@NonNull VH h, int pos) {
         Task t = data.get(pos);
-        isDone = t.isDone();
+        boolean isDone = t.isDone();
+
         h.title.setText(t.getTitle());
         h.cb.setOnCheckedChangeListener(null);
         h.cb.setChecked(isDone);
@@ -73,26 +88,37 @@ public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.VH> {
             }
         }
 
-        TextView tvDue = h.itemView.findViewById(R.id.tvDue);
+        // Due date color/visibility
         String ymd = t.getDueDate();
-        if (ymd == null || ymd.trim().isEmpty()) {
-            tvDue.setVisibility(View.GONE);
-        } else {
-            tvDue.setVisibility(View.VISIBLE);
-            tvDue.setText("Due " + pretty(ymd));
-
-            String today = new java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.US)
-                    .format(new java.util.Date());
-
-            int color;
-            if (ymd.equals(today)) {
-                color = androidx.core.content.ContextCompat.getColor(tvDue.getContext(), R.color.gold);
-            } else if (ymd.compareTo(today) > 0) {
-                color = androidx.core.content.ContextCompat.getColor(tvDue.getContext(), R.color.light_gray);
+        if (h.tvDue != null) {
+            if (ymd == null || ymd.trim().isEmpty()) {
+                h.tvDue.setVisibility(View.GONE);
             } else {
-                color = androidx.core.content.ContextCompat.getColor(tvDue.getContext(), R.color.charcoal);
+                h.tvDue.setVisibility(View.VISIBLE);
+                h.tvDue.setText("Due " + pretty(ymd));
+
+                String today = new java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.US)
+                        .format(new java.util.Date());
+
+                int color;
+                if (ymd.equals(today)) {
+                    color = androidx.core.content.ContextCompat.getColor(h.tvDue.getContext(), R.color.gold);
+                } else if (ymd.compareTo(today) > 0) {
+                    color = androidx.core.content.ContextCompat.getColor(h.tvDue.getContext(), R.color.light_gray);
+                } else {
+                    color = androidx.core.content.ContextCompat.getColor(h.tvDue.getContext(), R.color.charcoal);
+                }
+                h.tvDue.setTextColor(color);
             }
-            tvDue.setTextColor(color);
+        }
+
+        // Delete button
+        if (h.btnDelete != null) {
+            h.btnDelete.setOnClickListener(v -> {
+                if (remover != null && t.getId() != null) {
+                    remover.onRemove(t.getId());
+                }
+            });
         }
     }
 
@@ -107,7 +133,6 @@ public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.VH> {
         }
     }
 
-
     @Override
     public int getItemCount() { return data.size(); }
 
@@ -118,7 +143,9 @@ public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.VH> {
     }
 
     public int countUndone() {
-        int n = 0; for (Task t : data) if (!isDone) n++; return n;
+        int n = 0;
+        for (Task t : data) if (!t.isDone()) n++;
+        return n;
     }
 
     public Task findById(@NonNull String id) {

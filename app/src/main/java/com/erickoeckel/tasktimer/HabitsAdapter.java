@@ -10,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -25,18 +26,25 @@ public class HabitsAdapter extends RecyclerView.Adapter<HabitsAdapter.VH> {
 
     public interface Toggle { void onToggle(String id, boolean checked); }
     public interface Opener { void onOpen(@NonNull Habit habit); }
+    public interface Remover { void onRemove(@NonNull String id); }
 
     private final List<Habit> data = new ArrayList<>();
     private final Toggle toggle;
     @Nullable private final Opener opener;
+    @Nullable private final Remover remover;
 
     private final Map<String, Set<String>> weekCache = new HashMap<>();
 
-    public HabitsAdapter(Toggle toggle) { this(toggle, null); }
+    public HabitsAdapter(Toggle toggle) { this(toggle, null, null); }
 
     public HabitsAdapter(Toggle toggle, @Nullable Opener opener) {
+        this(toggle, opener, null);
+    }
+
+    public HabitsAdapter(Toggle toggle, @Nullable Opener opener, @Nullable Remover remover) {
         this.toggle = toggle;
         this.opener = opener;
+        this.remover = remover;
     }
 
     public void submit(List<Habit> list) {
@@ -49,6 +57,7 @@ public class HabitsAdapter extends RecyclerView.Adapter<HabitsAdapter.VH> {
     static class VH extends RecyclerView.ViewHolder {
         TextView title, streak, days;
         CheckBox today;
+        ImageButton btnDelete;
         String boundHabitId;
         VH(View v) {
             super(v);
@@ -56,6 +65,7 @@ public class HabitsAdapter extends RecyclerView.Adapter<HabitsAdapter.VH> {
             streak = v.findViewById(R.id.habitStreak);
             days   = v.findViewById(R.id.habitDays);
             today  = v.findViewById(R.id.habitToday);
+            btnDelete = v.findViewById(R.id.btnDelete);
         }
     }
 
@@ -103,6 +113,13 @@ public class HabitsAdapter extends RecyclerView.Adapter<HabitsAdapter.VH> {
 
         h.today.setEnabled(false);
         h.today.setAlpha(1f);
+
+        // Delete button
+        if (h.btnDelete != null) {
+            h.btnDelete.setOnClickListener(v -> {
+                if (remover != null && hb.getId() != null) remover.onRemove(hb.getId());
+            });
+        }
 
         renderDays(h.days, hb.getDays(), hb.getLastCompleted(), null);
 

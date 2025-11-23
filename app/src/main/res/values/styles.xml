@@ -175,5 +175,11 @@
         <item name="android:textColor">@color/auth_toggle_text</item>
     </style>
 
+    <style name="ThemeOverlay.TaskTimer.Alert" parent="ThemeOverlay.Material3.MaterialAlertDialog">
+        <item name="colorSurface">@color/charcoal</item>
+        <item name="colorOnSurface">@color/white</item>
+        <item name="colorPrimary">@color/gold</item>
+    </style>
+
 
 </resources>

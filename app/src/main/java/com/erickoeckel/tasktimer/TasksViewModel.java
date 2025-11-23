@@ -22,6 +22,9 @@ public class TasksViewModel extends ViewModel {
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
     private final FirebaseAuth auth = FirebaseAuth.getInstance();
 
+    private final String uid = (FirebaseAuth.getInstance().getCurrentUser() != null)
+            ? FirebaseAuth.getInstance().getCurrentUser().getUid() : "local";
+
     private final MutableLiveData<List<Task>> tasks = new MutableLiveData<>(new ArrayList<>());
     private ListenerRegistration reg;
 
@@ -187,4 +190,15 @@ public class TasksViewModel extends ViewModel {
     protected void onCleared() {
         if (reg != null) { reg.remove(); reg = null; }
     }
+
+    public com.google.android.gms.tasks.Task<Void> deleteTask(@androidx.annotation.NonNull String id) {
+        return db.collection("users").document(uid)
+                .collection("tasks").document(id)
+                .delete()
+                .continueWithTask(t -> db.collection("users").document(uid)
+                        .collection("tasks").get()
+                        .addOnSuccessListener(this::applySnapshot)
+                        .continueWith(tt -> null));
+    }
+
 }

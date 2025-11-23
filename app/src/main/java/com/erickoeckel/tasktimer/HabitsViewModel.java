@@ -122,4 +122,15 @@ public class HabitsViewModel extends ViewModel {
 
     private static int intOf(Object o) { return (o instanceof Number) ? ((Number) o).intValue() : 0; }
     private static String safe(String s, String d) { return (s == null || s.isEmpty()) ? d : s; }
+
+    public com.google.android.gms.tasks.Task<Void> deleteHabit(@androidx.annotation.NonNull String id) {
+        return db.collection("users").document(uid)
+                .collection("habits").document(id)
+                .delete()
+                .continueWithTask(t -> db.collection("users").document(uid)
+                        .collection("habits").get()
+                        .addOnSuccessListener(this::applySnapshot)
+                        .continueWith(tt -> null));
+    }
+
 }

@@ -22,7 +22,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import androidx.navigation.fragment.NavHostFragment;
-
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 public class TasksFragment extends Fragment {
 
@@ -71,6 +71,14 @@ public class TasksFragment extends Fragment {
             args.putBoolean("autoStart", true);
             NavHostFragment.findNavController(TasksFragment.this)
                     .navigate(R.id.timerFragment, args);
+        }, id -> {
+            new com.google.android.material.dialog.MaterialAlertDialogBuilder(
+                    requireContext(), R.style.ThemeOverlay_TaskTimer_Alert)
+                    .setTitle("Delete task?")
+                    .setMessage("This cannot be undone.")
+                    .setPositiveButton("Delete", (d, w) -> vm.deleteTask(id))
+                    .setNegativeButton("Cancel", null)
+                    .show();
         });
 
         rv.setAdapter(adapter);

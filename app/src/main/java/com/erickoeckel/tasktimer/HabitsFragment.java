@@ -12,7 +12,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.navigation.fragment.NavHostFragment;
-
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 public class HabitsFragment extends Fragment {
 
@@ -53,12 +53,17 @@ public class HabitsFragment extends Fragment {
             args.putBoolean("autoStart", true);
             NavHostFragment.findNavController(HabitsFragment.this)
                     .navigate(R.id.timerFragment, args);
+        }, id -> {
+            new com.google.android.material.dialog.MaterialAlertDialogBuilder(
+                    requireContext(), R.style.ThemeOverlay_TaskTimer_Alert)
+                    .setTitle("Delete habit?")
+                    .setMessage("This cannot be undone.")
+                    .setPositiveButton("Delete", (d, w) -> vm.deleteHabit(id))
+                    .setNegativeButton("Cancel", null)
+                    .show();
         });
 
-
-
         rv.setAdapter(adapter);
-
 
         vm.getHabits().observe(getViewLifecycleOwner(), list -> {
             adapter.submit(list);

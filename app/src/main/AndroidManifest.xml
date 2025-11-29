@@ -24,8 +24,8 @@
         <activity
             android:name=".MainActivity"
             android:exported="true"
-            tools:ignore="ExtraText">
-            android:theme="@style/Theme.TaskTimer.Splash">
+            tools:ignore="ExtraText"
+            android:windowSoftInputMode="stateUnspecified|adjustPan">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

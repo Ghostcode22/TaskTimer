@@ -83,6 +83,25 @@ public class TasksFragment extends Fragment {
 
         rv.setAdapter(adapter);
 
+        View infoBtn = v.findViewById(R.id.btnInfoTasks);
+        if (infoBtn != null) {
+            infoBtn.setOnClickListener(x -> HelpSheetFragment.show(
+                    getChildFragmentManager(),
+                    "Tasks",
+                    "Quick tips to manage tasks:",
+                    java.util.Arrays.asList(
+                            "Tap a task to start a focus session.",
+                            "Mic button = add by voice (e.g., “Buy milk tomorrow”).",
+                            "Due dates color code: gold=today, gray=future, charcoal=past.",
+                            "Tap the trash icon to delete a task."
+                    )));
+        }
+
+        if (Onboarding.shouldShow(requireContext(), "help_tasks_v1")) {
+            infoBtn.performClick();
+            Onboarding.markShown(requireContext(), "help_tasks_v1");
+        }
+
         fabAddTask = v.findViewById(R.id.fabAddTask);
         if (fabAddTask != null) {
             fabAddTask.setOnClickListener(view -> {

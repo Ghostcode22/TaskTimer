@@ -72,6 +72,25 @@ public class ShopFragment extends Fragment {
         );
 
         vm.start();
+
+        View infoBtn = v.findViewById(R.id.btnInfoShop);
+        if (infoBtn != null) {
+            infoBtn.setOnClickListener(x -> HelpSheetFragment.show(
+                    getChildFragmentManager(),
+                    "Coin Shop",
+                    "Unlock cosmetic items:",
+                    java.util.Arrays.asList(
+                            "Use coins earned from focus sessions.",
+                            "Locked items show a 🔒 until purchased.",
+                            "Purchases instantly unlock items in the editor.",
+                            "Coins shown in the pill at the top right."
+                    )));
+        }
+        if (Onboarding.shouldShow(requireContext(), "help_shop_v1")) {
+            if (infoBtn != null) infoBtn.performClick();
+            Onboarding.markShown(requireContext(), "help_shop_v1");
+        }
+
         return v;
     }
 }

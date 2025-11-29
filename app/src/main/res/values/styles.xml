@@ -181,5 +181,9 @@
         <item name="colorPrimary">@color/gold</item>
     </style>
 
+    <style name="ThemeOverlay.TaskTimer.BottomSheet" parent="ThemeOverlay.Material3.BottomSheetDialog">
+        <item name="colorSurface">@color/navy</item>
+        <item name="colorOnSurface">@color/white</item>
+    </style>
 
 </resources>

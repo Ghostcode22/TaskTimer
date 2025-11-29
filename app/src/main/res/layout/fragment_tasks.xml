@@ -35,6 +35,17 @@
         app:layout_constraintEnd_toEndOf="parent">
 
         <ImageButton
+            android:id="@+id/btnInfoTasks"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:padding="12dp"
+            android:background="@drawable/rounded_fab"
+            android:src="@android:drawable/ic_menu_info_details"
+            android:contentDescription="help" />
+
+        <View android:layout_width="8dp" android:layout_height="0dp"/>
+
+        <ImageButton
             android:id="@+id/fabVoiceTask"
             android:layout_width="48dp"
             android:layout_height="48dp"

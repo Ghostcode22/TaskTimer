@@ -3,6 +3,22 @@
     android:orientation="vertical" android:gravity="center"
     android:padding="24dp" android:layout_width="match_parent" android:layout_height="match_parent">
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="end">
+
+        <ImageButton
+            android:id="@+id/btnInfoTimer"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:padding="8dp"
+            android:background="@android:color/transparent"
+            android:src="@android:drawable/ic_menu_info_details"
+            android:contentDescription="help"/>
+    </LinearLayout>
+
     <TextView
         android:id="@+id/tvPhase"
         style="?attr/textAppearanceLabelLarge"

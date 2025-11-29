@@ -65,6 +65,24 @@ public class HabitsFragment extends Fragment {
 
         rv.setAdapter(adapter);
 
+        View infoBtn = v.findViewById(R.id.btnInfoHabits);
+        if (infoBtn != null) {
+            infoBtn.setOnClickListener(x -> HelpSheetFragment.show(
+                    getChildFragmentManager(),
+                    "Habits",
+                    "How habit tracking works:",
+                    java.util.Arrays.asList(
+                            "Tap a scheduled, not-done habit to start a focus session.",
+                            "🔥 Streak shows your consecutive days.",
+                            "Week row: gold=done, red=missed, underline=today.",
+                            "Trash icon deletes a habit."
+                    )));
+        }
+        if (Onboarding.shouldShow(requireContext(), "help_habits_v1")) {
+            if (infoBtn != null) infoBtn.performClick();
+            Onboarding.markShown(requireContext(), "help_habits_v1");
+        }
+
         vm.getHabits().observe(getViewLifecycleOwner(), list -> {
             adapter.submit(list);
             boolean isEmpty = (list == null || list.isEmpty());

@@ -91,6 +91,24 @@ public class TimerFragment extends Fragment {
             lastPhase[0] = p;
         });
 
+        View infoBtn = v.findViewById(R.id.btnInfoTimer);
+        if (infoBtn != null) {
+            infoBtn.setOnClickListener(x -> HelpSheetFragment.show(
+                    getChildFragmentManager(),
+                    "Timer",
+                    "Focus & break cycles:",
+                    java.util.Arrays.asList(
+                            "Start: begins a focus session; Pause/Reset as needed.",
+                            "When Focus ends, a Break starts and rewards are granted.",
+                            "If you came from a task/habit, you can Complete it after break.",
+                            "Cancel exits back to your list."
+                    )));
+        }
+        if (Onboarding.shouldShow(requireContext(), "help_timer_v1")) {
+            if (infoBtn != null) infoBtn.performClick();
+            Onboarding.markShown(requireContext(), "help_timer_v1");
+        }
+
         btnComplete.setOnClickListener(x -> {
             btnComplete.setEnabled(false);
 

@@ -120,6 +120,39 @@ public class AvatarEditorFragment extends Fragment {
         MaterialToolbar toolbar = root.findViewById(R.id.toolbarAvatar);
         if (toolbar != null) toolbar.setNavigationOnClickListener(v -> requireActivity().onBackPressed());
 
+        if (toolbar != null) {
+            toolbar.inflateMenu(R.menu.menu_help);
+            toolbar.setOnMenuItemClickListener(item -> {
+                if (item.getItemId() == R.id.action_help) {
+                    HelpSheetFragment.show(
+                            getChildFragmentManager(),
+                            "Avatar Editor",
+                            "Customize your look:",
+                            java.util.Arrays.asList(
+                                    "Tabs: Hair, Clothes, Face.",
+                                    "Locked items can be purchased in the Shop.",
+                                    "Some choices enable extra options (e.g., Graphic Shirt).",
+                                    "Save to lock in your profile."
+                            ));
+                    return true;
+                }
+                return false;
+            });
+        }
+        if (Onboarding.shouldShow(requireContext(), "help_avatar_v1")) {
+            HelpSheetFragment.show(
+                    getChildFragmentManager(),
+                    "Avatar Editor",
+                    "Customize your look:",
+                    java.util.Arrays.asList(
+                            "Tabs: Hair, Clothes, Face.",
+                            "Locked items can be purchased in the Shop.",
+                            "Some choices enable extra options (e.g., Graphic Shirt).",
+                            "Save to persist to your profile."
+                    ));
+            Onboarding.markShown(requireContext(), "help_avatar_v1");
+        }
+
         tabs = root.findViewById(R.id.tabs);
         if (tabs != null) {
             if (tabs.getTabCount() != 3) {

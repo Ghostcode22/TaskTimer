@@ -34,6 +34,17 @@
         app:layout_constraintEnd_toEndOf="parent">
 
         <ImageButton
+            android:id="@+id/btnInfoHabits"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:padding="12dp"
+            android:background="@drawable/rounded_fab"
+            android:src="@android:drawable/ic_menu_info_details"
+            android:contentDescription="@string/app_name" />
+
+        <View android:layout_width="8dp" android:layout_height="0dp"/>
+
+        <ImageButton
             android:id="@+id/fabAddHabit"
             android:layout_width="48dp"
             android:layout_height="48dp"

@@ -106,7 +106,7 @@ public class AvatarEditorFragment extends Fragment {
             ddGraphicType, ddHairColor, ddFacialHairType, ddFacialHairColor, ddEyeType, ddEyebrowType,
             ddMouthType, ddSkinColor;
 
-    private TextInputLayout tilHairColor, tilFacialHairColor, tilGraphicType;
+    private TextInputLayout tilHairColor, tilFacialHairColor, tilGraphicType, tilClotheColor;
 
     @Nullable @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -207,6 +207,7 @@ public class AvatarEditorFragment extends Fragment {
         tilHairColor       = root.findViewById(R.id.tilHairColor);
         tilFacialHairColor = root.findViewById(R.id.tilFacialHairColor);
         tilGraphicType     = root.findViewById(R.id.tilGraphicType);
+        tilClotheColor     = root.findViewById(R.id.tilClotheColor);
 
         startUnlocksListener();
         buildAllDropdowns();
@@ -591,9 +592,12 @@ public class AvatarEditorFragment extends Fragment {
 
         boolean showGraphic = "GraphicShirt".equals(cfg.clothing);
 
+        boolean showClotheColor = !isBlazer(cfg.clothing);
+
         setVisible(tilHairColor, showHairColor);
         setVisible(tilFacialHairColor, showFacialHairColor);
         setVisible(tilGraphicType, showGraphic);
+        setVisible(tilClotheColor, showClotheColor);
     }
 
     @Nullable private String currentFor(@NonNull MaterialAutoCompleteTextView dd) {

@@ -59,7 +59,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
                     android:hint="topType">
-                    <com.google.android.material.textfield.MaterialAutoCompleteTextView
+                    <com.erickoeckel.tasktimer.StickyAutoCompleteTextView
                         android:id="@+id/ddTopType"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -80,7 +80,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
                     android:hint="hairColor">
-                    <com.google.android.material.textfield.MaterialAutoCompleteTextView
+                    <com.erickoeckel.tasktimer.StickyAutoCompleteTextView
                         android:id="@+id/ddHairColor"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -100,7 +100,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
                     android:hint="facialHairType">
-                    <com.google.android.material.textfield.MaterialAutoCompleteTextView
+                    <com.erickoeckel.tasktimer.StickyAutoCompleteTextView
                         android:id="@+id/ddFacialHairType"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -120,7 +120,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
                     android:hint="facialHairColor">
-                    <com.google.android.material.textfield.MaterialAutoCompleteTextView
+                    <com.erickoeckel.tasktimer.StickyAutoCompleteTextView
                         android:id="@+id/ddFacialHairColor"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -154,7 +154,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
                     android:hint="clotheType">
-                    <com.google.android.material.textfield.MaterialAutoCompleteTextView
+                    <com.erickoeckel.tasktimer.StickyAutoCompleteTextView
                         android:id="@+id/ddClotheType"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -174,8 +174,8 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
                     android:hint="clotheColor">
-                    <com.google.android.material.textfield.MaterialAutoCompleteTextView
-                        android:id="@+id/ddClotheColor"
+                    <com.erickoeckel.tasktimer.StickyAutoCompleteTextView
+                    android:id="@+id/ddClotheColor"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:inputType="none"
@@ -194,7 +194,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
                     android:hint="graphicType">
-                    <com.google.android.material.textfield.MaterialAutoCompleteTextView
+                    <com.erickoeckel.tasktimer.StickyAutoCompleteTextView
                         android:id="@+id/ddGraphicType"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -214,7 +214,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
                     android:hint="accessoriesType">
-                    <com.google.android.material.textfield.MaterialAutoCompleteTextView
+                    <com.erickoeckel.tasktimer.StickyAutoCompleteTextView
                         android:id="@+id/ddAccessoriesType"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -249,7 +249,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
                     android:hint="eyeType">
-                    <com.google.android.material.textfield.MaterialAutoCompleteTextView
+                    <com.erickoeckel.tasktimer.StickyAutoCompleteTextView
                         android:id="@+id/ddEyeType"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -269,7 +269,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
                     android:hint="eyebrowType">
-                    <com.google.android.material.textfield.MaterialAutoCompleteTextView
+                    <com.erickoeckel.tasktimer.StickyAutoCompleteTextView
                         android:id="@+id/ddEyebrowType"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -289,7 +289,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
                     android:hint="mouthType">
-                    <com.google.android.material.textfield.MaterialAutoCompleteTextView
+                    <com.erickoeckel.tasktimer.StickyAutoCompleteTextView
                         android:id="@+id/ddMouthType"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -311,7 +311,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="12dp"
                     android:hint="skinColor">
-                    <com.google.android.material.textfield.MaterialAutoCompleteTextView
+                    <com.erickoeckel.tasktimer.StickyAutoCompleteTextView
                         android:id="@+id/ddSkinColor"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"

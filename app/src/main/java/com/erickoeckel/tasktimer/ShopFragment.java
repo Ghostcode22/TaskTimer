@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 public class ShopFragment extends Fragment {
 
@@ -45,22 +46,33 @@ public class ShopFragment extends Fragment {
         tvCoins = v.findViewById(R.id.btnCoins);
         rv = v.findViewById(R.id.rvShop);
 
-        vm = new ViewModelProvider(this).get(ShopViewModel.class);
+        vm = new ViewModelProvider(requireActivity()).get(ShopViewModel.class);
 
         rv.setLayoutManager(new LinearLayoutManager(requireContext()));
         rv.addItemDecoration(new DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL));
 
-        adapter = new ShopAdapter(item ->
-                vm.purchase(item)
-                        .addOnSuccessListener(x ->
-                                Toast.makeText(requireContext(), "Purchased " + item.title + "!", Toast.LENGTH_SHORT).show()
-                        )
-                        .addOnFailureListener(e ->
-                                Toast.makeText(requireContext(),
-                                        TextUtils.isEmpty(e.getMessage()) ? "Purchase failed" : e.getMessage(),
-                                        Toast.LENGTH_LONG).show()
-                        )
+        adapter = new ShopAdapter(
+                item -> {
+                    vm.purchase(item)
+                            .addOnSuccessListener(x ->
+                                    Toast.makeText(requireContext(), "Purchased " + item.title + "!", Toast.LENGTH_SHORT).show()
+                            )
+                            .addOnFailureListener(e ->
+                                    Toast.makeText(requireContext(),
+                                            TextUtils.isEmpty(e.getMessage()) ? "Purchase failed" : e.getMessage(),
+                                            Toast.LENGTH_LONG).show()
+                            );
+                },
+                item -> {
+                    boolean unlocked = false;
+                    Map<String, Boolean> u = vm.unlocks().getValue();
+                    if (u != null) unlocked = Boolean.TRUE.equals(u.get(item.slug));
+
+                    int coins = vm.coins().getValue() == null ? 0 : vm.coins().getValue();
+                    PreviewShopItemDialog.show(this, item, unlocked, coins);
+                }
         );
+
         rv.setAdapter(adapter);
 
         vm.coins().observe(getViewLifecycleOwner(), coins -> {
@@ -81,9 +93,9 @@ public class ShopFragment extends Fragment {
                     "Unlock cosmetic items:",
                     java.util.Arrays.asList(
                             "Use coins earned from focus sessions.",
-                            "Locked items show a 🔒 until purchased.",
                             "Purchases instantly unlock items in the editor.",
-                            "Coins shown in the pill at the top right."
+                            "Coins shown in the pill at the top right.",
+                            "See a preview of the item on your avatar by clicking the item"
                     )));
         }
         if (Onboarding.shouldShow(requireContext(), "help_shop_v1")) {

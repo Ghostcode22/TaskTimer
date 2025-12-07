@@ -94,4 +94,36 @@ public class AvatarConfig {
 
         return m;
     }
+
+    public static AvatarConfig copyOf(@Nullable AvatarConfig src) {
+        AvatarConfig c = new AvatarConfig();
+        if (src == null) return c;
+
+        c.seed = src.seed;
+
+        c.top = src.top;
+        c.hairColor = src.hairColor;
+
+        c.eyes = src.eyes;
+        c.eyebrows = src.eyebrows;
+        c.mouth = src.mouth;
+
+        c.accessories = src.accessories;
+        c.accessoriesOn = src.accessoriesOn;
+
+        c.facialHair = src.facialHair;
+        c.facialHairColor = src.facialHairColor;
+        c.facialHairOn = src.facialHairOn;
+
+        c.skinColor = src.skinColor;
+
+        c.background = src.background;
+
+        c.clothing = src.clothing;
+        c.clothesColor = src.clothesColor;
+        c.clothingGraphic = src.clothingGraphic;
+
+        return c;
+    }
+
 }

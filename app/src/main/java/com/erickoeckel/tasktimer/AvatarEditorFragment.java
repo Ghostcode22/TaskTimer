@@ -146,9 +146,9 @@ public class AvatarEditorFragment extends Fragment {
                     "Customize your look:",
                     java.util.Arrays.asList(
                             "Tabs: Hair, Clothes, Face.",
-                            "Locked items can be purchased in the Shop.",
+                            "Locked items show a 🔒 until purchased in the shop.",
                             "Some choices enable extra options (e.g., Graphic Shirt).",
-                            "Save to persist to your profile."
+                            "Save to lock in to your profile."
                     ));
             Onboarding.markShown(requireContext(), "help_avatar_v1");
         }
@@ -517,20 +517,22 @@ public class AvatarEditorFragment extends Fragment {
         dd.setOnItemClickListener((parent, view, position, id) -> {
             String picked = values[position];
             boolean ok = checker.isUnlocked(unlocks, picked);
+
             if (!ok) {
                 Toast.makeText(requireContext(), "Locked — buy in Shop", Toast.LENGTH_SHORT).show();
                 String cur = currentFor(dd);
-                ad.setSelectedKey(cur);
+                CheckedAdapter adNow = (CheckedAdapter) dd.getAdapter();
+                adNow.setSelectedKey(cur);
                 if (cur != null) dd.setText(cur, false);
                 return;
             }
+
             onPick.accept(picked);
-            ad.setSelectedKey(picked);
+            CheckedAdapter adNow = (CheckedAdapter) dd.getAdapter();
+            adNow.setSelectedKey(picked);
             dd.setText(picked, false);
             refresh();
         });
-
-        attachPopupRecenter(dd);
     }
 
     private interface UnlockCheck {
@@ -555,12 +557,11 @@ public class AvatarEditorFragment extends Fragment {
         dd.setOnItemClickListener((p, v, pos, id) -> {
             String picked = values[pos];
             apply.accept(picked);
-            ad.setSelectedKey(picked);
+            CheckedAdapter adNow = (CheckedAdapter) dd.getAdapter();
+            adNow.setSelectedKey(picked);
             dd.setText(picked, false);
             refresh();
         });
-
-        attachPopupRecenter(dd);
     }
 
     private void selectIn(@Nullable MaterialAutoCompleteTextView dd, @Nullable String value) {
@@ -577,10 +578,20 @@ public class AvatarEditorFragment extends Fragment {
         dd.setInputType(android.text.InputType.TYPE_NULL);
         dd.setKeyListener(null);
         dd.setCursorVisible(false);
-        dd.setFocusable(false);
+        dd.setFocusable(true);
         dd.setClickable(true);
         dd.setOnClickListener(v -> dd.showDropDown());
         dd.setOnFocusChangeListener((v, has) -> { if (has) dd.showDropDown(); });
+    }
+
+    private void reopenAndCenter(MaterialAutoCompleteTextView dd) {
+        dd.post(() -> {
+            dd.showDropDown();
+            dd.post(() -> {
+                int idx = selectedIndexOf(dd);
+                if (idx >= 0) dd.setListSelection(idx);
+            });
+        });
     }
 
     private void updateConditionalRowsVisibility() {
@@ -646,34 +657,6 @@ public class AvatarEditorFragment extends Fragment {
         }
     }
 
-    private void attachPopupRecenter(MaterialAutoCompleteTextView dd) {
-        View.OnClickListener openAndCenter = v -> {
-            if (!dd.isPopupShowing()) dd.showDropDown();
-            dd.post(() -> {
-                int idx = selectedIndexOf(dd);
-                if (idx >= 0) dd.setListSelection(idx);
-            });
-        };
-
-        dd.setOnClickListener(openAndCenter);
-
-        dd.setOnFocusChangeListener((v, has) -> { if (has) openAndCenter.onClick(v); });
-
-        TextInputLayout til = findTextInputLayout(dd);
-        if (til != null) {
-            til.setEndIconOnClickListener(v -> {
-                if (dd.isPopupShowing()) {
-                    dd.dismissDropDown();
-                } else {
-                    dd.showDropDown();
-                    dd.post(() -> {
-                        int idx = selectedIndexOf(dd);
-                        if (idx >= 0) dd.setListSelection(idx);
-                    });
-                }
-            });
-        }
-    }
 
     private static class CheckedAdapter extends ArrayAdapter<String> {
         private final List<String> data;

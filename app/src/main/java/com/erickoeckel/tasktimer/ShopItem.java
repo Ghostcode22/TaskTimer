@@ -19,4 +19,6 @@ public class ShopItem {
         return Objects.equals(slug, that.slug);
     }
     @Override public int hashCode(){ return Objects.hash(slug); }
+
+    public String unlockKey() { return slug; }
 }

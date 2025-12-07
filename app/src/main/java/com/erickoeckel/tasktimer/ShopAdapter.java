@@ -10,16 +10,19 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.*;
 
 public class ShopAdapter extends RecyclerView.Adapter<ShopAdapter.VH> {
-
     public interface OnBuyClick { void onBuy(ShopItem item); }
+    public interface OnPreviewClick { void onPreview(ShopItem item); }
 
     private final OnBuyClick onBuy;
+    private final OnPreviewClick onPreview;
     private final List<ShopItem> items = new ArrayList<>();
     private Map<String, Boolean> unlocks = new HashMap<>();
     private int coins = 0;
 
-    public ShopAdapter(@NonNull OnBuyClick onBuy){ this.onBuy = onBuy; }
-
+    public ShopAdapter(@NonNull OnBuyClick onBuy, @NonNull OnPreviewClick onPreview) {
+        this.onBuy = onBuy;
+        this.onPreview = onPreview;
+    }
     public void submit(List<ShopItem> src, Map<String, Boolean> unlocks, int coins){
         items.clear(); items.addAll(src);
         this.unlocks = (unlocks == null) ? new HashMap<>() : unlocks;
@@ -40,11 +43,12 @@ public class ShopAdapter extends RecyclerView.Adapter<ShopAdapter.VH> {
         h.tvDesc.setText(it.desc);
         h.tvPrice.setText("Price: " + it.price + " 🪙");
 
-        h.btnBuy.setText(owned ? "Owned" : "Buy");
         boolean canBuy = !owned && coins >= it.price;
+        h.btnBuy.setText(owned ? "Owned" : "Buy");
         h.btnBuy.setEnabled(canBuy);
         h.btnBuy.setAlpha(canBuy ? 1f : 0.5f);
         h.btnBuy.setOnClickListener(v -> { if (canBuy) onBuy.onBuy(it); });
+        h.itemView.setOnClickListener(v -> onPreview.onPreview(it));
     }
 
     @Override public int getItemCount() { return items.size(); }
